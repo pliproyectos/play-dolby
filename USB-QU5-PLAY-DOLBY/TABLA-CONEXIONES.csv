@@ -1,0 +1,9 @@
+﻿Señal original,Conector Qu-5 propuesto,Canal Qu-5,Nombre,Fuente hacia PC,USB salida Qu / entrada PC,Destino Play Dolby
+FL,Local 1,CH1,FL,Input Direct Out 1,1,FL / Frontal izquierdo
+FR,Local 2,CH2,FR,Input Direct Out 2,2,FR / Frontal derecho
+C,Local 3,CH3,C,Input Direct Out 3,3,C / Centro
+LFE,Local 4,CH4,LFE,Input Direct Out 4,4,LFE / Efectos graves
+BL,Local 5,CH5,BL,Input Direct Out 5,5,BL / Trasero izquierdo
+BR,Local 6,CH6,BR,Input Direct Out 6,6,BR / Trasero derecho
+SL,Local 7,CH7,SL,Input Direct Out 7,7,SL / Lateral izquierdo
+SR,Local 8,CH8,SR,Input Direct Out 8,8,SR / Lateral derecho

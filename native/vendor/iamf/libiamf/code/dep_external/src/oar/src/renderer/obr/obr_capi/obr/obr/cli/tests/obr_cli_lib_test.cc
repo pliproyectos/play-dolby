@@ -1,0 +1,103 @@
+/*
+ * Copyright (c) 2025, Alliance for Open Media. All rights reserved
+ *
+ * This source code is subject to the terms of the BSD 3-Clause Clear License
+ * and the Alliance for Open Media Patent License 1.0. If the BSD 3-Clause Clear
+ * License was not distributed with this source code in the LICENSE file, you
+ * can obtain it at www.aomedia.org/license/software-license/bsd-3-c-c. If the
+ * Alliance for Open Media Patent License 1.0 was not distributed with this
+ * source code in the PATENTS file, you can obtain it at
+ * www.aomedia.org/license/patent.
+ */
+#include "obr/cli/obr_cli_lib.h"
+
+#include <cstddef>
+#include <filesystem>
+#include <string>
+
+// [internal] Placeholder for get runfiles header.
+#include "absl/strings/str_cat.h"
+#include "absl/strings/str_replace.h"
+#include "absl/strings/string_view.h"
+#include "gtest/gtest.h"
+#include "obr/renderer/audio_element_config.h"
+#include "obr/renderer/audio_element_type.h"
+
+namespace obr {
+namespace {
+
+constexpr absl::string_view kTestDataDir = "obr/cli/testdata/";
+constexpr absl::string_view kNoObaMetadata = "";
+constexpr size_t kBufferSize = 256;
+
+std::string GetAndCleanupOutputFileName(absl::string_view suffix) {
+  const testing::TestInfo* const test_info =
+      testing::UnitTest::GetInstance()->current_test_info();
+  std::string filename = absl::StrCat(test_info->name(), "-",
+                                      test_info->test_suite_name(), suffix);
+
+  // It is possible that the test case name contain the '/' character.
+  // Replace it with '-' to form a legal file name.
+  absl::StrReplaceAll({{"/", "-"}}, &filename);
+  const std::filesystem::path test_specific_filename =
+      std::filesystem::path(::testing::TempDir()) / filename;
+
+  std::filesystem::remove(test_specific_filename);
+  return test_specific_filename.string();
+}
+
+struct CliTestCase {
+  AudioElementType input_type;
+  absl::string_view wav_filename;
+  absl::string_view oba_metadata_filename = "";
+  bool expected_ok = true;
+  BinauralFilterProfile filter_type = BinauralFilterProfile::kAmbient;
+};
+
+using CliMainTest = ::testing::TestWithParam<CliTestCase>;
+
+TEST_P(CliMainTest, RenderToFiles) {
+  const auto& test_case = GetParam();
+  const auto input_filename =
+      (std::filesystem::current_path() / kTestDataDir / test_case.wav_filename)
+          .string();
+  const std::string oba_metadata_filename =
+      test_case.oba_metadata_filename.empty()
+          ? ""
+          : (std::filesystem::current_path() / kTestDataDir /
+             test_case.oba_metadata_filename)
+                .string();
+
+  const auto output_filename = GetAndCleanupOutputFileName(".wav");
+  const auto status = obr::ObrCliMain(
+      test_case.input_type, oba_metadata_filename, input_filename,
+      output_filename, kBufferSize, test_case.filter_type);
+  EXPECT_EQ(status.ok(), test_case.expected_ok);
+  EXPECT_EQ(std::filesystem::exists(output_filename), test_case.expected_ok);
+}
+
+INSTANTIATE_TEST_SUITE_P(
+    Succeeds, CliMainTest,
+    ::testing::Values(CliTestCase{AudioElementType::k3OA, "7.1.4_test_3OA.wav"},
+                      CliTestCase{AudioElementType::kLayout7_1_4_ch,
+                                  "7.1.4_test_individual_channels.wav"},
+                      CliTestCase{AudioElementType::kObjectMono,
+                                  "7.1.4_test_individual_channels.wav",
+                                  "7.1.4_test_oba.textproto"}));
+
+INSTANTIATE_TEST_SUITE_P(
+    FailsWithMismatchingTypeAndInput, CliMainTest,
+    ::testing::Values(CliTestCase{AudioElementType::k3OA,
+                                  "7.1.4_test_individual_channels.wav",
+                                  kNoObaMetadata, false},
+                      CliTestCase{AudioElementType::kLayout7_1_4_ch,
+                                  "7.1.4_test_3OA.wav", kNoObaMetadata, false},
+                      CliTestCase{AudioElementType::kObjectMono,
+                                  "7.1.4_test_3OA.wav",
+                                  "7.1.4_test_oba.textproto", false},
+                      CliTestCase{AudioElementType::kObjectMono,
+                                  "7.1.4_test_individual_channels.wav",
+                                  kNoObaMetadata, false}));
+
+}  // namespace
+}  // namespace obr

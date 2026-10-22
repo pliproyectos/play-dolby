@@ -1,0 +1,21 @@
+Copyright (c) 2026 PLI Ingeniería Aplicada. Todos los derechos reservados.
+
+Play Dolby, PLI Espacial y el resto del código, la documentación, las señales de prueba y los
+recursos gráficos de este repositorio son propiedad de PLI Ingeniería Aplicada.
+
+El repositorio es público para consulta y para distribuir actualizaciones a las instalaciones de
+PLI Ingeniería Aplicada. Que sea visible NO concede licencia: sin autorización previa y por escrito
+de PLI Ingeniería Aplicada, no se permite copiar, modificar, distribuir, sublicenciar ni usar este
+material con fines comerciales.
+
+Contacto: pli.proyectos@gmail.com
+
+-------------------------------------------------------------------------------
+Componentes de terceros incluidos (conservan su propia licencia):
+
+- PortAudio (native/vendor/portaudio.dll y portaudio.h): licencia MIT. Ross Bencina y Phil Burk.
+  El binario incluye soporte ASIO (Steinberg Media Technologies GmbH). Ver native/vendor/PORTAUDIO-*.
+- libiamf y oar (native/vendor/iamf): BSD-3-Clause-Clear, Alliance for Open Media. Ver sus archivos
+  LICENSE y native/vendor/iamf/PROCEDENCIA.md.
+- Zig (compilador, NO incluido; se descarga con native/tools/obtener-zig.ps1): licencia MIT.
+- EBU ADM Renderer (NO incluido; se instala con native/tools/crear-ear-venv.ps1): BSD-3-Clause-Clear.

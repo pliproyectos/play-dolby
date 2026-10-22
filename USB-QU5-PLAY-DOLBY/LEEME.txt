@@ -1,0 +1,4 @@
+PLAY DOLBY / QU-5
+
+Abrir GUIA-QU5-USB.html. Tabla en TABLA-CONEXIONES.csv.
+Este paquete NO contiene un Show nativo cargable. La configuracion debe guardarse una primera vez desde la Qu-5. No copiar estos documentos dentro de AH_QU/SHOWS como si fueran datos de consola.

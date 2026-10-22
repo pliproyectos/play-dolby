@@ -1,0 +1,2 @@
+#include "app_resources.h"
+IDI_PLI_APP ICON "../assets/pli-app.ico"

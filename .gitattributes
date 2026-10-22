@@ -1,0 +1,17 @@
+# Texto con fin de línea normalizado; scripts de Windows siempre en CRLF.
+* text=auto
+*.cmd text eol=crlf
+*.bat text eol=crlf
+*.ps1 text eol=crlf
+
+# Binarios
+*.wav binary
+*.png binary
+*.ico binary
+*.dll binary
+*.exe binary
+*.zip binary
+*.iamf binary
+*.mp4 binary
+*.docx binary
+*.pdf binary

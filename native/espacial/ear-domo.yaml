@@ -1,0 +1,13 @@
+# Distribución del domo para el renderizador EBU EAR (ear-render -s 0+7+0 -l ear-domo.yaml).
+# Ángulos de pruebas-domo/domo.json en convención ADM (azimut positivo = IZQUIERDA).
+# Canal = orden de salida de Windows/PLI: FL FR FC LFE BL BR SL SR.
+# Mantener sincronizado con domo.json cuando se midan los ángulos reales.
+speakers:
+  - {channel: 0, names: M+030, polar_position: {az: 30, el: 0, r: 2}}
+  - {channel: 1, names: M-030, polar_position: {az: -30, el: 0, r: 2}}
+  - {channel: 2, names: M+000, polar_position: {az: 0, el: 0, r: 2}}
+  - {channel: 3, names: LFE1, polar_position: {az: 45, el: -30, r: 2}}
+  - {channel: 4, names: M+135, polar_position: {az: 145, el: 0, r: 2}}
+  - {channel: 5, names: M-135, polar_position: {az: -145, el: 0, r: 2}}
+  - {channel: 6, names: M+090, polar_position: {az: 100, el: 0, r: 2}}
+  - {channel: 7, names: M-090, polar_position: {az: -100, el: 0, r: 2}}

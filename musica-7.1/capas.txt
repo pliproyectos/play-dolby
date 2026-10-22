@@ -1,0 +1,58 @@
+Capas — Cosmic Home Theater Experience (Remix)
+
+Reconstrucción (suma de capas vs original): error 93.9 dB bajo la señal
+
+Energía por capa:
+   bombo        2.3 %
+   percusion    4.2 %
+   bajo        56.7 %
+   voz          9.4 %
+   colchon     27.1 %
+   brillos      0.3 %
+
+Coreografía (las velocidades se multiplican por el tramo: 0 hasta 8 s, sube a 1 en 16 s, 1,6 entre 120 y 150 s, baja al final):
+   bajo: fijo en FL/FR + LFE (graves < 80 Hz)
+   bombo: fijo al frente (FL+FR) + LFE
+   voz/solista: al frente, se mece entre FL, C y FR (±25°, ciclo de 24 s)
+   colchón: abierto a los lados (L en SL, R en SR), gira horario 1,5 v/min
+   brillos: nacen atrás, giran antihorario 3 v/min
+   percusión aguda: nace al frente abierta, gira horario 5 v/min
+
+Posición de las capas móviles (grados) cada 7 s:
+      0 s: colchón    0  brillos  180  percusión    0
+      7 s: colchón    0  brillos  180  percusión    0
+     14 s: colchón   20  brillos  139  percusión   68
+     21 s: colchón   81  brillos   18  percusión  270
+     28 s: colchón  144  brillos  252  percusión  120
+     35 s: colchón  207  brillos  126  percusión  330
+     42 s: colchón  270  brillos  360  percusión  180
+     49 s: colchón  333  brillos  234  percusión   30
+     56 s: colchón   36  brillos  108  percusión  240
+     63 s: colchón   99  brillos  342  percusión   90
+     70 s: colchón  162  brillos  216  percusión  300
+     77 s: colchón  225  brillos   90  percusión  150
+     84 s: colchón  288  brillos  324  percusión    0
+     91 s: colchón  351  brillos  198  percusión  210
+     98 s: colchón   54  brillos   72  percusión   60
+    105 s: colchón  117  brillos  306  percusión  270
+    112 s: colchón  180  brillos  180  percusión  120
+    119 s: colchón  243  brillos   54  percusión  330
+    126 s: colchón  338  brillos  223  percusión  288
+    133 s: colchón   79  brillos   22  percusión  264
+    140 s: colchón  180  brillos  180  percusión  240
+    147 s: colchón  281  brillos  338  percusión  216
+    154 s: colchón    0  brillos  180  percusión  120
+    161 s: colchón   55  brillos   70  percusión  304
+    168 s: colchón   89  brillos    3  percusión   55
+    175 s: colchón  114  brillos  313  percusión  139
+
+== Cosmic Home Theater Experience (Remix) - 7.1-instrumentos.wav
+   Ganancia global: 0.00 dB | no finitos: 0
+   FL  pico   -2.02 dBFS  RMS  -18.88 dBFS
+   FR  pico   -2.28 dBFS  RMS  -18.84 dBFS
+   C   pico   -5.82 dBFS  RMS  -27.64 dBFS
+   LFE pico  -14.62 dBFS  RMS  -28.75 dBFS
+   BL  pico   -6.71 dBFS  RMS  -27.51 dBFS
+   BR  pico   -6.90 dBFS  RMS  -28.11 dBFS
+   SL  pico   -6.74 dBFS  RMS  -27.07 dBFS
+   SR  pico   -5.19 dBFS  RMS  -27.25 dBFS

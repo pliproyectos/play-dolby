@@ -1,0 +1,26 @@
+# PARCHE DOLBY · lo que NO se sube al repositorio (todo se regenera; ver README.md)
+
+# Compilador Zig (zig.exe pesa 164 MB > límite de 100 MB de GitHub): native/tools/obtener-zig.ps1
+native/tools/zig-*/
+# Entorno de Python de EAR (no es portable entre PC): native/tools/crear-ear-venv.ps1
+native/tools/ear-venv/
+
+# Compilación (native/build-*.ps1). portaudio.dll y el logo se copian solos desde vendor/ y assets/
+native/.zig-cache*/
+native/zig-out/
+native/bin/
+*.pdb
+
+# Salidas generadas
+pruebas-domo/salida/
+# Música: por ahora no se sube (decisión de Luis, 2026-10-22). Solo los reportes de texto.
+musica-7.1/*
+!musica-7.1/analisis.txt
+!musica-7.1/capas.txt
+
+# Paquetes y temporales
+*.zip.partial
+__pycache__/
+*.pyc
+Thumbs.db
+desktop.ini

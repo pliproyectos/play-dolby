@@ -1,0 +1,36 @@
+Análisis — Cosmic Home Theater Experience (Remix)
+
+Origen: PCM estéreo, 48000 Hz, 175.1 s (8402944 muestras)
+Pico L/R: -0.78 / -0.10 dBFS | RMS L/R: -16.48 / -16.54 dBFS
+Muestras en tope digital L/R: 0 / 0 | DC L/R: 0.00328 / 0.00310
+Correlación L/R: 0.605 (1 = mono, 0 = sin relación) | energía lateral/central (S/M): -6.1 dB
+
+== conservador → Cosmic Home Theater Experience (Remix) - 7.1-conservador.wav
+   Ganancia global aplicada: 0.00 dB | no finitos: 0
+   FL  pico   -3.10 dBFS  RMS  -19.18 dBFS
+   FR  pico   -2.96 dBFS  RMS  -19.25 dBFS
+   C   pico   -9.86 dBFS  RMS  -27.25 dBFS
+   LFE pico -999.00 dBFS  RMS -999.00 dBFS
+   BL  pico  -11.43 dBFS  RMS  -30.18 dBFS
+   BR  pico  -12.68 dBFS  RMS  -30.18 dBFS
+   SL  pico  -10.40 dBFS  RMS  -27.13 dBFS
+   SR  pico   -9.93 dBFS  RMS  -27.13 dBFS
+
+== orbita → Cosmic Home Theater Experience (Remix) - 7.1-orbita.wav
+   Ganancia global aplicada: 0.00 dB | no finitos: 0
+   FL  pico   -2.95 dBFS  RMS  -25.58 dBFS
+   FR  pico   -3.23 dBFS  RMS  -26.12 dBFS
+   C   pico   -2.96 dBFS  RMS  -29.21 dBFS
+   LFE pico  -14.57 dBFS  RMS  -28.73 dBFS
+   BL  pico   -3.56 dBFS  RMS  -27.93 dBFS
+   BR  pico   -4.75 dBFS  RMS  -28.67 dBFS
+   SL  pico   -4.21 dBFS  RMS  -27.91 dBFS
+   SR  pico   -5.31 dBFS  RMS  -28.25 dBFS
+   Recorrido de la órbita:
+    0 s: quieto al frente
+    8 s: 2.00 vueltas/min
+    40 s: 4.00 vueltas/min
+    80 s: -3.0 vueltas/min (antihorario)
+    120 s: 6.00 vueltas/min
+    150 s: 1.50 vueltas/min
+

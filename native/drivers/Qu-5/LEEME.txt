@@ -1,0 +1,9 @@
+CONTROLADOR ALLEN & HEATH QU-5/6/7 PARA WINDOWS X64
+
+El acceso iniciar-propuesta-cinematic.bat comprueba el controlador y descarga aqui el ZIP oficial cuando hace falta.
+Si Allen & Heath solicita verificacion en el navegador, completa la descarga desde su enlace oficial.
+Extrae el ZIP y ejecuta el instalador del fabricante. Luego vuelve a abrir el acceso BAT.
+Este proyecto no ejecuta ni instala el controlador automaticamente.
+
+Pagina oficial:
+https://www.allen-heath.com/hardware/qu/qu-5-qu-5d/resources/

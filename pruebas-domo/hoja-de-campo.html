@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hoja de campo del domo</title>
+<style>
+  :root { --tinta: #1a1a1a; --linea: #9a9a9a; --suave: #f1f1f1; }
+  body { font: 10.5pt/1.35 "Segoe UI", Arial, sans-serif; color: var(--tinta); background: #fff; max-width: 190mm; margin: 0 auto; padding: 12px 16px; }
+  h1 { font-size: 16pt; margin: 0 0 2px; }
+  h2 { font-size: 12pt; margin: 14px 0 4px; border-bottom: 1.5px solid var(--tinta); padding-bottom: 2px; }
+  p { margin: 3px 0; }
+  .nota { font-size: 9pt; color: #444; }
+  table { width: 100%; border-collapse: collapse; margin: 4px 0; table-layout: fixed; }
+  th, td { border: 1px solid var(--linea); padding: 3px 5px; vertical-align: top; }
+  th { background: var(--suave); text-align: left; font-weight: 600; }
+  td.e { height: 18px; }
+  .ok { width: 9%; text-align: center; }
+  .campo { display: inline-block; min-width: 42mm; border-bottom: 1px solid var(--linea); }
+  .pagina { break-before: page; }
+  @media print { body { padding: 0; } .noimp { display: none; } }
+</style>
+</head>
+<body>
+<p class="noimp nota">Imprimir con Ctrl+P. Pensado para tamaño carta o A4, a una cara.</p>
+<h1>Hoja de campo — pruebas del domo 7.1</h1>
+<p class="nota">Kit pruebas-domo v1.0.0 · archivos verificados en escritorio el 2026-10-20 · la cadena física se verifica con esta hoja.</p>
+<p>Fecha <span class="campo">&nbsp;</span> Hora <span class="campo" style="min-width:20mm">&nbsp;</span> Responsable <span class="campo">&nbsp;</span></p>
+
+<h2>1. Configuración al empezar</h2>
+<table>
+  <tr><th style="width:38%">Dato</th><th>Valor</th></tr>
+  <tr><td>Windows: configuración de altavoces (debe decir 7.1)</td><td class="e"></td></tr>
+  <tr><td>Windows: formato predeterminado (bits / Hz)</td><td class="e"></td></tr>
+  <tr><td>Carpeta usada (48kHz / 96kHz) y reproductor</td><td class="e"></td></tr>
+  <tr><td>Integra: entrada y modo de escucha (Direct / Multichannel)</td><td class="e"></td></tr>
+  <tr><td>Integra: pantalla de información (formato de entrada, canales, Hz)</td><td class="e"></td></tr>
+  <tr><td>Integra: AccuEQ / Dirac (apagado para identificar)</td><td class="e"></td></tr>
+  <tr><td>Integra: volumen inicial</td><td class="e"></td></tr>
+  <tr><td>Integra: tamaño de bocinas, cruce, distancias y niveles (foto del menú)</td><td class="e"></td></tr>
+</table>
+
+<h2>2. Ficha del domo (medida)</h2>
+<p class="nota">Azimut en grados: 0 = frente, positivo hacia la derecha. Distancia a la butaca central. Esto reemplaza los valores provisionales de domo.json.</p>
+<table>
+  <tr><th style="width:9%">Canal</th><th>Nombre en el Integra</th><th style="width:13%">Azimut °</th><th style="width:13%">Elevación °</th><th style="width:13%">Distancia m</th><th>Bocina / notas</th></tr>
+  <tr><td>FL</td><td>Front L</td><td></td><td></td><td></td><td></td></tr>
+  <tr><td>FR</td><td>Front R</td><td></td><td></td><td></td><td></td></tr>
+  <tr><td>FC</td><td>Center</td><td></td><td></td><td></td><td></td></tr>
+  <tr><td>LFE</td><td>Subwoofer</td><td>—</td><td>—</td><td></td><td></td></tr>
+  <tr><td>BL</td><td>Surround Back L</td><td></td><td></td><td></td><td></td></tr>
+  <tr><td>BR</td><td>Surround Back R</td><td></td><td></td><td></td><td></td></tr>
+  <tr><td>SL</td><td>Surround L</td><td></td><td></td><td></td><td></td></tr>
+  <tr><td>SR</td><td>Surround R</td><td></td><td></td><td></td><td></td></tr>
+</table>
+<p>¿Dónde queda el frente del domo? <span class="campo" style="min-width:60mm">&nbsp;</span> Butacas: ☐ unidireccionales ☐ concéntricas</p>
+
+<h2>3. P1 — Identificación (01-identificacion)</h2>
+<table>
+  <tr><th style="width:9%">Canal</th><th style="width:22%">La voz dice</th><th>Bocina donde sonó</th><th class="ok">OK</th></tr>
+  <tr><td>FL</td><td>Frontal izquierdo</td><td></td><td class="ok">☐</td></tr>
+  <tr><td>FR</td><td>Frontal derecho</td><td></td><td class="ok">☐</td></tr>
+  <tr><td>FC</td><td>Central</td><td></td><td class="ok">☐</td></tr>
+  <tr><td>LFE</td><td>Subgrave (por el central; luego ruido solo en el sub)</td><td></td><td class="ok">☐</td></tr>
+  <tr><td>BL</td><td>Trasero izquierdo</td><td></td><td class="ok">☐</td></tr>
+  <tr><td>BR</td><td>Trasero derecho</td><td></td><td class="ok">☐</td></tr>
+  <tr><td>SL</td><td>Lateral izquierdo</td><td></td><td class="ok">☐</td></tr>
+  <tr><td>SR</td><td>Lateral derecho</td><td></td><td class="ok">☐</td></tr>
+</table>
+
+<h2>4. P1 — Vuelta al domo (02-vuelta-al-domo)</h2>
+<table>
+  <tr><th style="width:22%">Sentido</th><th>¿Gira suave? ¿Saltos o huecos? ¿Entre qué bocinas?</th><th class="ok">OK</th></tr>
+  <tr><td>Horario (2 vueltas)</td><td class="e"></td><td class="ok">☐</td></tr>
+  <tr><td>Antihorario (2 vueltas)</td><td class="e"></td><td class="ok">☐</td></tr>
+</table>
+
+<div class="pagina"></div>
+<h2>5. P1 — Polaridad (03-polaridad)</h2>
+<p class="nota">«Uno» = en fase; «dos» = segunda bocina invertida. Lo normal es que «uno» suene más lleno y enfocado entre ambas.</p>
+<table>
+  <tr><th style="width:26%">Par (orden del archivo)</th><th style="width:22%">¿Cuál suena más enfocado?</th><th>Notas</th><th class="ok">OK</th></tr>
+  <tr><td>Central y frontal derecho</td><td>☐ uno ☐ dos</td><td></td><td class="ok">☐</td></tr>
+  <tr><td>Frontal derecho y lateral derecho</td><td>☐ uno ☐ dos</td><td></td><td class="ok">☐</td></tr>
+  <tr><td>Lateral derecho y trasero derecho</td><td>☐ uno ☐ dos</td><td></td><td class="ok">☐</td></tr>
+  <tr><td>Trasero derecho y trasero izquierdo</td><td>☐ uno ☐ dos</td><td></td><td class="ok">☐</td></tr>
+  <tr><td>Trasero izquierdo y lateral izquierdo</td><td>☐ uno ☐ dos</td><td></td><td class="ok">☐</td></tr>
+  <tr><td>Lateral izquierdo y frontal izquierdo</td><td>☐ uno ☐ dos</td><td></td><td class="ok">☐</td></tr>
+  <tr><td>Frontal izquierdo y central</td><td>☐ uno ☐ dos</td><td></td><td class="ok">☐</td></tr>
+</table>
+
+<h2>6. P1 — Referencias de formato (06-ref-*)</h2>
+<table>
+  <tr><th style="width:24%">Archivo</th><th>¿Dónde sonó cada canal? (sobre todo los traseros/laterales del 5.1)</th></tr>
+  <tr><td>06-ref-mono</td><td class="e"></td></tr>
+  <tr><td>06-ref-estereo</td><td class="e"></td></tr>
+  <tr><td>06-ref-5.1 (traseros, 0x3F)</td><td class="e"></td></tr>
+  <tr><td>06-ref-5.1-laterales (0x60F)</td><td class="e"></td></tr>
+  <tr><td>06-ref-7.1</td><td class="e"></td></tr>
+</table>
+
+<h2>7. P1 — Calibración (04-calibracion, −20 dBFS RMS)</h2>
+<p>Sonómetro: modelo <span class="campo">&nbsp;</span> ponderación ☐ C ☐ A · respuesta ☐ lenta ☐ rápida · posición: butaca central, altura de oído.</p>
+<p>Nivel objetivo (decide Luis): <span class="campo" style="min-width:25mm">&nbsp;</span> dB</p>
+<table>
+  <tr><th style="width:9%">Canal</th><th>Lectura dB</th><th>Ajuste de nivel en el Integra</th><th>Lectura tras ajuste</th></tr>
+  <tr><td>FL</td><td></td><td></td><td></td></tr>
+  <tr><td>FR</td><td></td><td></td><td></td></tr>
+  <tr><td>FC</td><td></td><td></td><td></td></tr>
+  <tr><td>LFE</td><td></td><td></td><td></td></tr>
+  <tr><td>BL</td><td></td><td></td><td></td></tr>
+  <tr><td>BR</td><td></td><td></td><td></td></tr>
+  <tr><td>SL</td><td></td><td></td><td></td></tr>
+  <tr><td>SR</td><td></td><td></td><td></td></tr>
+</table>
+
+<h2>8. Trayectoria de la señal</h2>
+<table>
+  <tr><th style="width:34%">Punto</th><th>Resultado (mismo mapeo que P1 / qué cambió)</th><th class="ok">OK</th></tr>
+  <tr><td>P1 Reproductor → HDMI</td><td class="e"></td><td class="ok">☐</td></tr>
+  <tr><td>P2 Tonos internos de Play Dolby</td><td class="e"></td><td class="ok">☐</td></tr>
+  <tr><td>P3 Consola Qu-5 → USB → Play Dolby</td><td class="e"></td><td class="ok">☐</td></tr>
+  <tr><td>P4 Nightshade → toda la cadena</td><td class="e"></td><td class="ok">☐</td></tr>
+</table>
+
+<h2>9. Observaciones</h2>
+<table><tr><td style="height:60mm"></td></tr></table>
+</body>
+</html>
