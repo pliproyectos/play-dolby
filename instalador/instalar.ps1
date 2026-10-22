@@ -5,6 +5,7 @@ param(
     [string]$Destino = (Join-Path $env:LOCALAPPDATA 'Programs\Play Dolby'),
     [string]$Escritorio = [Environment]::GetFolderPath('Desktop'),
     [string]$MenuInicio = (Join-Path ([Environment]::GetFolderPath('Programs')) 'Play Dolby'),
+    [string]$AlIniciar = [Environment]::GetFolderPath('Startup'),   # revisión de actualizaciones al prender la PC
     [switch]$SinRegistro,
     [switch]$Silencioso
 )
@@ -65,6 +66,13 @@ try {
     Acceso (Join-Path $MenuInicio 'Léeme.lnk') (Join-Path $Destino 'LEEME.txt') '' '' '' 'Resumen rápido'
     Acceso (Join-Path $MenuInicio 'Guía de usuario.lnk') (Join-Path $Destino 'guia\GUIA-DE-USUARIO.md') '' '' '' 'Guía completa de Play Dolby, con capturas'
     Acceso (Join-Path $MenuInicio 'Desinstalar Play Dolby.lnk') $ps ('-NoProfile -ExecutionPolicy Bypass -File "' + (Join-Path $Destino 'desinstalar.ps1') + '"') $env:TEMP '' 'Quita Play Dolby de esta PC'
+
+    if (Test-Path (Join-Path $Destino 'actualizador.ps1')) {
+        Paso 'Activando la búsqueda de actualizaciones al prender la PC (con aviso)'
+        New-Item -ItemType Directory -Force -Path $AlIniciar | Out-Null
+        Acceso (Join-Path $AlIniciar 'Play Dolby - buscar actualizaciones.lnk') $ps ('-NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File "' + (Join-Path $Destino 'actualizador.ps1') + '" -Revisar') $Destino '' 'Revisa si hay una versión nueva de Play Dolby y avisa'
+        Acceso (Join-Path $MenuInicio 'Buscar actualizaciones.lnk') $ps ('-NoProfile -ExecutionPolicy Bypass -File "' + (Join-Path $Destino 'actualizador.ps1') + '" -Revisar') $Destino '' 'Revisa ahora si hay una versión nueva de Play Dolby'
+    }
 
     if (-not $SinRegistro) {
         Paso 'Registrando en «Aplicaciones instaladas»'

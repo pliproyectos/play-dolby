@@ -15,6 +15,7 @@ inline RECT orbitBounds = { 700, 76, 962, 278 };
 // Dynamic Space (PLI Espacial fase 3b): si hay pintor, dibuja el domo en vivo en orbitBounds y las
 // barras de las tarjetas. Todo lo que pinta cae dentro de dynamicBounds; la vista solo redibuja eso.
 inline void (*dynamicPainter)(HDC) = nullptr;
+inline std::wstring versionTexto;  // «versión 2026.10.22» (VERSION.txt junto al exe)
 inline RECT dynamicBounds = { 30, 76, 1190, 500 };
 
 inline const COLORREF bgPaper       = RGB(17, 17, 25);     // Deep cinematic night #111119
@@ -132,6 +133,7 @@ inline void paint(HDC dc, bool isRunning, HFONT font, HFONT titleFont, HFONT sma
         g.DrawImage(companyLogo,Gdiplus::Rect(30,(70-height)/2,160,height),0,0,companyLogo->GetWidth(),companyLogo->GetHeight(),Gdiplus::UnitPixel,&attrs);
     }
     text(dc,L"PLAY DOLBY / AUDIO CONTROL",{220,24,700,50},smallFont,ink);
+    if(!versionTexto.empty())text(dc,versionTexto.c_str(),{220,42,700,62},smallFont,muted,DT_SINGLELINE);
     round(dc,{1024,18,1190,53},isRunning?RGB(38,66,60):RGB(46,41,62),18);
     text(dc,isRunning?L"●  EN VIVO":L"○  DETENIDO",{1036,18,1180,53},smallFont,isRunning?statusLive:ink,DT_CENTER|DT_VCENTER|DT_SINGLELINE);
     text(dc,L"EL ESPACIO ES TUYO",{30,92,600,113},smallFont,accent);

@@ -201,7 +201,42 @@ Son programas de línea de comandos; se usan desde PowerShell.
 
 El formato de las escenas está en `herramientas\ESCENAS.md`.
 
-## 10. Dónde guarda las cosas
+## 10. Actualizaciones (con aviso)
+
+Las terminales instaladas se actualizan desde GitHub (`pliproyectos/play-dolby`) **siempre
+preguntando**. El encabezado muestra la versión instalada, por ejemplo «versión 2026.10.22».
+
+**Cuándo revisan:**
+- **al prender la PC**, con un acceso en el Inicio de Windows que trabaja oculto;
+- **al abrir Play Dolby y cada 12 horas** mientras está abierto;
+- **cuando quieras**, con «Buscar actualizaciones» en el menú Inicio.
+
+**Cuando hay una versión nueva:**
+- La baja y **verifica su huella SHA-256**. Si no coincide, la descarta.
+- Si Play Dolby está cerrado, pregunta «¿Instalarla ahora?».
+- Si está abierto, aparece arriba el botón **«⟳ Actualización … · Instalar»**.
+
+**Al instalar:**
+- **Nunca se instala con el audio en vivo.** Primero hay que pulsar ■ Detener.
+- Play Dolby se cierra, se actualiza y se vuelve a abrir.
+- **Se conserva tu `domo.json`** y se guarda un respaldo de la versión anterior.
+- **Si la versión nueva no arranca, regresa sola a la anterior** y lo avisa.
+
+Sin internet no pasa nada: lo vuelve a intentar en la siguiente revisión. Lo que hace queda anotado en
+`%LOCALAPPDATA%\PlanetarioBridge\actualizacion\actualizacion.log`.
+
+**Para publicar una versión nueva (en la PC de desarrollo):**
+1. Compila con los tres `native\build-*.ps1` (corren las pruebas).
+2. Haz commit y push.
+3. Corre `pwsh -File native\publicar-version.ps1 -Version 2026.10.25`. Arma
+   `publicar\PlayDolby-2026.10.25.zip` y su `.sha256`, y abre la página de GitHub.
+4. En GitHub, crea el Release con la etiqueta **`v2026.10.25`**, sube **los dos archivos** y pulsa
+   **Publish release**. Esa es la señal para todas las terminales.
+
+La versión tiene que ser **mayor** que la instalada. Para una segunda versión el mismo día:
+`2026.10.25.1`.
+
+## 11. Dónde guarda las cosas
 
 - **Programa:** `%LOCALAPPDATA%\Programs\Play Dolby` (o la carpeta de la USB si no lo instalaste).
 - **Perfil, objetos y bitácora:** `%LOCALAPPDATA%\PlanetarioBridge`

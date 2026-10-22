@@ -4,6 +4,7 @@ param(
     [string]$Destino = $PSScriptRoot,
     [string]$Escritorio = [Environment]::GetFolderPath('Desktop'),
     [string]$MenuInicio = (Join-Path ([Environment]::GetFolderPath('Programs')) 'Play Dolby'),
+    [string]$AlIniciar = [Environment]::GetFolderPath('Startup'),
     [switch]$SinRegistro,
     [switch]$Silencioso
 )
@@ -21,6 +22,8 @@ try {
     $acceso = Join-Path $Escritorio 'Play Dolby.lnk'
     if (Test-Path $acceso) { Remove-Item -LiteralPath $acceso -Force }
     if (Test-Path $MenuInicio) { Remove-Item -LiteralPath $MenuInicio -Recurse -Force }
+    $revision = Join-Path $AlIniciar 'Play Dolby - buscar actualizaciones.lnk'
+    if (Test-Path $revision) { Remove-Item -LiteralPath $revision -Force }
     if (-not $SinRegistro) { Remove-Item -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\PlayDolbyPLI' -Recurse -Force -ErrorAction SilentlyContinue }
     Set-Location $env:TEMP
     Remove-Item -LiteralPath $Destino -Recurse -Force

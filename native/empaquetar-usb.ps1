@@ -7,7 +7,10 @@
 #   programa\    (PlayDolby.exe, portaudio.dll, domo.json, herramientas\…)
 #   demo\        (capas de Cosmic para «Carpeta de capas…» y prueba-7.1.wav)
 #   -Reemplazar: borra antes un paquete ANTERIOR de Play Dolby en ese destino (solo si lo es).
-param([Parameter(Mandatory)][string]$Destino, [switch]$SinDemo, [switch]$Reemplazar)
+#   -Version     : versión del paquete (por omisión, la fecha: 2026.10.22). Para una segunda versión el mismo día: 2026.10.22.1
+#   -Repositorio : de dónde se actualizan las terminales (Releases públicos de GitHub)
+param([Parameter(Mandatory)][string]$Destino, [switch]$SinDemo, [switch]$Reemplazar,
+      [string]$Version = (Get-Date -Format 'yyyy.MM.dd'), [string]$Repositorio = 'pliproyectos/play-dolby')
 $ErrorActionPreference = 'Stop'
 $proy = Split-Path $PSScriptRoot -Parent
 $bin = Join-Path $PSScriptRoot 'bin'
@@ -50,8 +53,12 @@ Copy-Item (Join-Path $proy 'docs\GUIA-DE-USUARIO.md') $guia
 Copy-Item (Join-Path $proy 'docs\img\*.png') (Join-Path $guia 'img')
 Copy-Item (Join-Path $proy 'docs\GUIA-DE-USUARIO.md') (Join-Path $Destino 'GUIA-DE-USUARIO.md')
 
-$version = (Get-Date -Format 'yyyy.MM.dd')
+try { [void][version]$Version } catch { throw "Versión inválida: $Version (formato 2026.10.22 o 2026.10.22.1)" }
+$version = $Version
 Set-Content -LiteralPath (Join-Path $prog 'VERSION.txt') -Value @($version, "Compilado: $((Get-Item (Join-Path $bin 'PlayDolby.exe')).LastWriteTime.ToString('yyyy-MM-dd HH:mm'))") -Encoding ascii
+# Actualizaciones con aviso desde los Releases de GitHub (instalador\actualizador.ps1).
+CopiaPs1 (Join-Path $fuente 'actualizador.ps1') (Join-Path $prog 'actualizador.ps1')
+@{ repositorio = $Repositorio; intervalo_horas = 12; modo = 'con aviso' } | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $prog 'actualizacion.json') -Encoding ascii
 
 if (-not $SinDemo) {
     $demo = Join-Path $Destino 'demo'

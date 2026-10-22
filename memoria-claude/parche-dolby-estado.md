@@ -5,7 +5,7 @@ metadata:
   node_type: memory
   type: project
   originSessionId: d0c97d44-cdbe-4b6c-844f-da7a94ce1940
-  modified: 2026-10-22T18:36:16.685Z
+  modified: 2026-10-22T18:58:44.043Z
 ---
 
 Al 2026-10-20 el proyecto PARCHE DOLBY (planetario con domo 7.1) migra de PC: la PC del domo (GPU AMD) deja de usarse. El paquete completo va en la USB KINGSTON `D:\PARCHE DOLBY`, sincronizado y verificado con SHA-256. El `CLAUDE.md` de la raíz del proyecto es la memoria que viaja con el código; empezar por ahí.
@@ -59,7 +59,14 @@ Al 2026-10-20 el proyecto PARCHE DOLBY (planetario con domo 7.1) migra de PC: la
   - ventana normal (maximizar y cambiar de tamaño), sin F11, Dynamic Space en la columna;
   - guía en `docs/GUIA-DE-USUARIO.md`;
   - git init en la raíz, sin commit, esperando la cuenta de GitHub de Luis. No hay `gh` instalado; para subir: git + Git Credential Manager.
+- GitHub: `pliproyectos/play-dolby`, público, licencia propietaria de PLI, sin la música.
+  - Primer commit hecho por Luis; el push falló porque Git usaba la sesión de `lalomalvi`.
+  - Solución: `git remote set-url origin https://pliproyectos@github.com/...`.
+- Actualizaciones con aviso (lo pidió Luis):
+  - revisa al prender la PC y cada 12 h;
+  - se publica con `native/publicar-version.ps1` más un Release `vAAAA.MM.DD` con el ZIP y su `.sha256`.
 - Gotchas:
+  - En PowerShell, `R` es un alias de `Invoke-History`: no llamar `R` a una función.
   - En PowerShell, `$null` pasado a una función de Windows llega como "": usar `[NullString]::Value` (FindWindow).
   - La herramienta PowerShell de Claude bloquea comandos con rutas `D:\…` o con Remove-Item junto a rutas con espacios (falso positivo). Para operar en la USB, correr pwsh desde Bash.
   - libiamf entrega el 7.1 en orden ITU (laterales antes que traseros); `iamf71` lo reordena a Windows.

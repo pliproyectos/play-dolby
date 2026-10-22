@@ -282,6 +282,7 @@ bool start(bool test, int channel = -1);
 #include "channel_tester.hpp"
 #include "espacial_panel.hpp"
 #include "fuente_ui.hpp"
+#include "actualizacion_ui.hpp"
 
 void stop() {
     tester::cancel();
@@ -441,7 +442,7 @@ LRESULT CALLBACK proc(HWND h, UINT m, WPARAM w, LPARAM l) {
         }
         if (d->CtlType != ODT_BUTTON) return FALSE;
         bool disabled = d->itemState & ODS_DISABLED, pressed = d->itemState & ODS_SELECTED;
-        const bool space = d->CtlID == 19 && engine.core.espacio.activo, hot = d->CtlID == 11 || space;
+        const bool space = d->CtlID == 19 && engine.core.espacio.activo, hot = d->CtlID == 11 || d->CtlID == 25 || space;
         COLORREF bg = hot ? theme::blue : d->CtlID == 12 ? RGB(54,39,70) : RGB(35,32,46);
         if (disabled) bg = RGB(24, 25, 34);
         else if (pressed) bg = RGB(45, 48, 68);
@@ -476,6 +477,7 @@ LRESULT CALLBACK proc(HWND h, UINT m, WPARAM w, LPARAM l) {
         if (id == 16) tester::open();
         if (id == 18) espacialUI::open();
         if (id == 19) espacialUI::alterna();
+        if (id == 25) actualizacion::instalar();
         if (id >= 20 && id < 24) espacialUI::escenaRapida(id - 20);
         if (id == 24 && code == CBN_SELCHANGE) {
             const float speeds[] = { 0.f, .25f, .5f, .75f, 1.f, 1.25f, 1.5f };
@@ -501,6 +503,7 @@ LRESULT CALLBACK proc(HWND h, UINT m, WPARAM w, LPARAM l) {
             return 0;
         }
         espacialUI::syncPrincipal();
+        actualizacion::tick();
         tester::tick();
 
         if (engine.running()) {
@@ -584,6 +587,9 @@ int WINAPI wWinMain(HINSTANCE inst, HINSTANCE, PWSTR, int) {
     chrome::apply(window);
     chrome::setIcons(window);
 
+    // Actualización con aviso: solo visible cuando hay una versión nueva descargada y verificada.
+    HWND botonActualizar = control(L"BUTTON", L"", 690, 18, 318, 35, 25, WS_TABSTOP);
+
     // Dynamic Space (PLI Espacial fase 3b), en la columna junto al domo: encendido, escenas rápidas y velocidad maestra.
     control(L"BUTTON", L"○  DYNAMIC SPACE", 974, 80, 216, 30, 19, WS_TABSTOP);
     {
@@ -643,6 +649,7 @@ int WINAPI wWinMain(HINSTANCE inst, HINSTANCE, PWSTR, int) {
     espacialUI::cargaFicha();  // puente detenido: lee pruebas-domo\domo.json para PLI Espacial
     theme::dynamicPainter = espacialUI::pintaPrincipal;
     espacialUI::syncPrincipal();
+    actualizacion::inicia(botonActualizar);
     SetTimer(window, 1, 100, nullptr);
     SetTimer(window, 2, 33, nullptr);
     ShowWindow(window, SW_SHOW);

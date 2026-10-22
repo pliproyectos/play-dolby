@@ -19,6 +19,7 @@ musica-7.1/*
 !musica-7.1/capas.txt
 
 # Paquetes y temporales
+publicar/
 *.zip.partial
 __pycache__/
 *.pyc
