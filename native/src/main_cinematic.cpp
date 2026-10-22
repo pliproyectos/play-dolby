@@ -442,7 +442,7 @@ LRESULT CALLBACK proc(HWND h, UINT m, WPARAM w, LPARAM l) {
         }
         if (d->CtlType != ODT_BUTTON) return FALSE;
         bool disabled = d->itemState & ODS_DISABLED, pressed = d->itemState & ODS_SELECTED;
-        const bool space = d->CtlID == 19 && engine.core.espacio.activo, hot = d->CtlID == 11 || d->CtlID == 25 || space;
+        const bool space = d->CtlID == 19 && engine.core.espacio.activo, hot = d->CtlID == 11 || (d->CtlID == 25 && !actualizacion::lista.empty()) || space;
         COLORREF bg = hot ? theme::blue : d->CtlID == 12 ? RGB(54,39,70) : RGB(35,32,46);
         if (disabled) bg = RGB(24, 25, 34);
         else if (pressed) bg = RGB(45, 48, 68);
@@ -587,8 +587,8 @@ int WINAPI wWinMain(HINSTANCE inst, HINSTANCE, PWSTR, int) {
     chrome::apply(window);
     chrome::setIcons(window);
 
-    // Actualización con aviso: solo visible cuando hay una versión nueva descargada y verificada.
-    HWND botonActualizar = control(L"BUTTON", L"", 690, 18, 318, 35, 25, WS_TABSTOP);
+    // Actualizaciones con aviso: «Buscar actualizaciones», o resaltado «Actualización X · Instalar» si hay una lista.
+    HWND botonActualizar = control(L"BUTTON", L"⟳  Buscar actualizaciones", 690, 18, 318, 35, 25, WS_TABSTOP);
 
     // Dynamic Space (PLI Espacial fase 3b), en la columna junto al domo: encendido, escenas rápidas y velocidad maestra.
     control(L"BUTTON", L"○  DYNAMIC SPACE", 974, 80, 216, 30, 19, WS_TABSTOP);

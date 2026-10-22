@@ -16,6 +16,7 @@ double intervaloHoras = 12;
 ULONGLONG inicio = 0, ultimaRevision = 0, ultimaLectura = 0;
 std::wstring lista;        // versión descargada y verificada, lista para instalar
 HWND boton = nullptr;
+HANDLE busqueda = nullptr; // revisión pedida con el botón «Buscar actualizaciones» (en curso)
 
 inline std::vector<int> partes(const std::wstring& v) {
     std::vector<int> r; int n = 0; bool hay = false;
@@ -29,14 +30,18 @@ inline bool masNueva(const std::wstring& a, const std::wstring& b) {  // a > b
     return x > y;
 }
 
-inline void lanza(const std::wstring& args, bool oculto) {
+// Lanza el actualizador. Devuelve el proceso si se pide (para esperar su resultado); si no, lo suelta.
+inline HANDLE lanza(const std::wstring& args, bool oculto, bool esperar = false) {
     wchar_t sys[MAX_PATH]; GetSystemDirectoryW(sys, MAX_PATH);
     std::wstring cmd = L"\"" + std::wstring(sys) + L"\\WindowsPowerShell\\v1.0\\powershell.exe\" -NoProfile " + (oculto ? L"-WindowStyle Hidden " : L"") +
                        L"-ExecutionPolicy Bypass -File \"" + (dir / L"actualizador.ps1").wstring() + L"\" " + args;
     STARTUPINFOW si{}; si.cb = sizeof(si); PROCESS_INFORMATION pi{};
-    if (CreateProcessW(nullptr, cmd.data(), nullptr, nullptr, FALSE, oculto ? CREATE_NO_WINDOW : CREATE_NEW_CONSOLE, nullptr, dir.c_str(), &si, &pi)) {
-        CloseHandle(pi.hThread); CloseHandle(pi.hProcess);
-    } else log("ACTUALIZACION no se pudo lanzar el actualizador");
+    if (!CreateProcessW(nullptr, cmd.data(), nullptr, nullptr, FALSE, oculto ? CREATE_NO_WINDOW : CREATE_NEW_CONSOLE, nullptr, dir.c_str(), &si, &pi)) {
+        log("ACTUALIZACION no se pudo lanzar el actualizador"); return nullptr;
+    }
+    CloseHandle(pi.hThread);
+    if (esperar) return pi.hProcess;
+    CloseHandle(pi.hProcess); return nullptr;
 }
 
 inline std::string leeTexto(const std::filesystem::path& p) {
@@ -45,13 +50,16 @@ inline std::string leeTexto(const std::filesystem::path& p) {
     return t;
 }
 
+// El botón siempre está (si las actualizaciones están activas): «Buscar actualizaciones», o resaltado
+// «Actualización X · Instalar» cuando hay una versión nueva lista.
+inline void textoBoton() {
+    std::wstring t = busqueda ? L"⟳  Buscando actualizaciones…" : lista.empty() ? L"⟳  Buscar actualizaciones" : L"⟳  Actualización " + lista + L" · Instalar";
+    SetWindowTextW(boton, t.c_str()); InvalidateRect(boton, nullptr, FALSE);
+}
 inline void muestra(const std::wstring& v) {
     if (v == lista) return;
-    lista = v;
-    if (v.empty()) { ShowWindow(boton, SW_HIDE); return; }
-    SetWindowTextW(boton, (L"⟳  Actualización " + v + L" · Instalar").c_str());
-    ShowWindow(boton, SW_SHOW); InvalidateRect(boton, nullptr, FALSE);
-    status(L"Hay una versión nueva de Play Dolby (" + v + L"), descargada y verificada. Pulsa «Instalar» arriba cuando el audio esté detenido.");
+    lista = v; textoBoton();
+    if (!v.empty()) status(L"Hay una versión nueva de Play Dolby (" + v + L"), descargada y verificada. Pulsa «Instalar» arriba cuando el audio esté detenido.");
 }
 
 inline void leeEstado() {
@@ -66,7 +74,7 @@ inline void leeEstado() {
 }
 
 inline void inicia(HWND b) {
-    boton = b; ShowWindow(boton, SW_HIDE);
+    boton = b;
     wchar_t exe[MAX_PATH]; GetModuleFileNameW(nullptr, exe, MAX_PATH);
     dir = std::filesystem::path(exe).parent_path();
     std::wifstream v(dir / L"VERSION.txt"); std::getline(v, version);
@@ -76,12 +84,32 @@ inline void inicia(HWND b) {
     if (activo) {
         try { auto j = pli::LectorJson(leeTexto(dir / L"actualizacion.json")).leer(); if (j["intervalo_horas"].tipo == pli::Json::Numero && j["intervalo_horas"].n >= 1) intervaloHoras = j["intervalo_horas"].n; } catch (...) {}
         log("ACTUALIZACION activa, version " + std::string(version.begin(), version.end()) + ", cada " + std::to_string(int(intervaloHoras)) + " h");
-    }
+        textoBoton();
+    } else ShowWindow(boton, SW_HIDE);  // versión de desarrollo (native\bin): sin actualizaciones
     inicio = GetTickCount64();
+}
+
+// Botón «Buscar actualizaciones»: revisa ahora y dice el resultado en la barra de estado.
+inline void buscar() {
+    if (busqueda) return;
+    busqueda = lanza(L"-Revisar -DesdeApp", true, true);
+    if (!busqueda) { status(L"No se pudo lanzar la búsqueda de actualizaciones."); return; }
+    textoBoton();
+    status(L"Buscando actualizaciones en GitHub…");
+}
+inline void terminaBusqueda() {
+    CloseHandle(busqueda); busqueda = nullptr;
+    leeEstado(); textoBoton();
+    if (!lista.empty()) return;  // muestra() ya avisó de la versión nueva
+    try {
+        auto j = pli::LectorJson(leeTexto(dataDir() / L"actualizacion" / L"ultima.json")).leer();
+        status(j["mensaje"].tipo == pli::Json::Texto ? wide(j["mensaje"].s) : L"Búsqueda terminada.");
+    } catch (...) { status(L"Búsqueda terminada: revisa la bitácora del actualizador."); }
 }
 
 inline void tick() {  // timer de 100 ms
     if (!activo) return;
+    if (busqueda && WaitForSingleObject(busqueda, 0) == WAIT_OBJECT_0) terminaBusqueda();
     const ULONGLONG ahora = GetTickCount64();
     const bool primera = ultimaRevision == 0 && ahora - inicio > 10000;
     if (primera || (ultimaRevision && ahora - ultimaRevision > ULONGLONG(intervaloHoras * 3600000.))) { lanza(L"-Revisar -DesdeApp", true); ultimaRevision = ahora; }
@@ -89,7 +117,7 @@ inline void tick() {  // timer de 100 ms
 }
 
 inline void instalar() {
-    if (lista.empty()) return;
+    if (lista.empty()) { buscar(); return; }
     if (engine.running()) { status(L"Detén el audio (■ Detener) para instalar la actualización. Nunca se instala con el puente en vivo."); return; }
     if (MessageBoxW(window, (L"¿Instalar Play Dolby " + lista + L" ahora?\n\nPlay Dolby se cerrará, se actualizará y se volverá a abrir. "
                              L"Tu ficha del domo se conserva y, si la nueva versión no arranca, regresa sola a la anterior.").c_str(),

@@ -209,12 +209,14 @@ preguntando**. El encabezado muestra la versión instalada, por ejemplo «versi�
 **Cuándo revisan:**
 - **al prender la PC**, con un acceso en el Inicio de Windows que trabaja oculto;
 - **al abrir Play Dolby y cada 12 horas** mientras está abierto;
-- **cuando quieras**, con «Buscar actualizaciones» en el menú Inicio.
+- **cuando quieras**, con el botón **«⟳ Buscar actualizaciones»** del encabezado de Play Dolby (o
+  «Buscar actualizaciones» en el menú Inicio). La barra de abajo dice el resultado: «Estás al día»,
+  «No se pudo consultar GitHub (revisa internet)» o «Hay una versión nueva».
 
 **Cuando hay una versión nueva:**
 - La baja y **verifica su huella SHA-256**. Si no coincide, la descarta.
 - Si Play Dolby está cerrado, pregunta «¿Instalarla ahora?».
-- Si está abierto, aparece arriba el botón **«⟳ Actualización … · Instalar»**.
+- Si está abierto, el botón del encabezado se resalta y cambia a **«⟳ Actualización … · Instalar»**.
 
 **Al instalar:**
 - **Nunca se instala con el audio en vivo.** Primero hay que pulsar ■ Detener.
