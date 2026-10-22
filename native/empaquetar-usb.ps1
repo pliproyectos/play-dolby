@@ -58,7 +58,7 @@ $version = $Version
 Set-Content -LiteralPath (Join-Path $prog 'VERSION.txt') -Value @($version, "Compilado: $((Get-Item (Join-Path $bin 'PlayDolby.exe')).LastWriteTime.ToString('yyyy-MM-dd HH:mm'))") -Encoding ascii
 # Actualizaciones con aviso desde los Releases de GitHub (instalador\actualizador.ps1).
 CopiaPs1 (Join-Path $fuente 'actualizador.ps1') (Join-Path $prog 'actualizador.ps1')
-@{ repositorio = $Repositorio; intervalo_horas = 12; modo = 'con aviso' } | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $prog 'actualizacion.json') -Encoding ascii
+[ordered]@{ repositorio = $Repositorio; intervalo_horas = 12; modo = 'con aviso' } | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $prog 'actualizacion.json') -Encoding ascii
 
 if (-not $SinDemo) {
     $demo = Join-Path $Destino 'demo'
