@@ -1,0 +1,17 @@
+Fuente (anotar),Lado,Entrada Qu-5,Canal Qu-5,Modo,Fuente de la salida USB,USB salida Qu / entrada PC,Objeto PLI Espacial
+1,L,Local 1,CH1,Estéreo 1-2,Input Direct Out 1,1,Objeto 1 · USB 1-2 estéreo
+1,R,Local 2,CH2,Estéreo 1-2,Input Direct Out 2,2,Objeto 1 · USB 1-2 estéreo
+2,L,Local 3,CH3,Estéreo 3-4,Input Direct Out 3,3,Objeto 2 · USB 3-4 estéreo
+2,R,Local 4,CH4,Estéreo 3-4,Input Direct Out 4,4,Objeto 2 · USB 3-4 estéreo
+3,L,Local 5,CH5,Estéreo 5-6,Input Direct Out 5,5,Objeto 3 · USB 5-6 estéreo
+3,R,Local 6,CH6,Estéreo 5-6,Input Direct Out 6,6,Objeto 3 · USB 5-6 estéreo
+4,L,Local 7,CH7,Estéreo 7-8,Input Direct Out 7,7,Objeto 4 · USB 7-8 estéreo
+4,R,Local 8,CH8,Estéreo 7-8,Input Direct Out 8,8,Objeto 4 · USB 7-8 estéreo
+5,L,Local 9,CH9,Estéreo 9-10,Input Direct Out 9,9,Objeto 5 · USB 9-10 estéreo
+5,R,Local 10,CH10,Estéreo 9-10,Input Direct Out 10,10,Objeto 5 · USB 9-10 estéreo
+6,L,Local 11,CH11,Estéreo 11-12,Input Direct Out 11,11,Objeto 6 · USB 11-12 estéreo
+6,R,Local 12,CH12,Estéreo 11-12,Input Direct Out 12,12,Objeto 6 · USB 11-12 estéreo
+7,L,Local 13,CH13,Estéreo 13-14,Input Direct Out 13,13,Objeto 7 · USB 13-14 estéreo
+7,R,Local 14,CH14,Estéreo 13-14,Input Direct Out 14,14,Objeto 7 · USB 13-14 estéreo
+8,L,Local 15,CH15,Estéreo 15-16,Input Direct Out 15,15,Objeto 8 · USB 15-16 estéreo
+8,R,Local 16,CH16,Estéreo 15-16,Input Direct Out 16,16,Objeto 8 · USB 15-16 estéreo

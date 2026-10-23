@@ -52,6 +52,14 @@ $guia = Join-Path $prog 'guia'; New-Item -ItemType Directory -Force -Path (Join-
 Copy-Item (Join-Path $proy 'docs\GUIA-DE-USUARIO.md') $guia
 Copy-Item (Join-Path $proy 'docs\img\*.png') (Join-Path $guia 'img')
 Copy-Item (Join-Path $proy 'docs\GUIA-DE-USUARIO.md') (Join-Path $Destino 'GUIA-DE-USUARIO.md')
+# Configuración de la consola Qu-5 (se hace en la consola; no hay Show cargable desde la PC).
+$qu = Join-Path $Destino 'CONSOLA-QU5'; New-Item -ItemType Directory -Force -Path $qu | Out-Null
+foreach ($f in 'GUIA-QU5-8-ESTEREO.md', 'TABLA-8-ESTEREO.csv') { Copy-Item (Join-Path $proy "USB-QU5-PLAY-DOLBY\$f") $qu }
+# Extensión de Chrome «PLI Espacial 7.1» (música del navegador → 7.1). Sin la carpeta de pruebas.
+# Va dentro de programa\ para que se instale con Play Dolby (botón «Extensión Chrome 7.1»).
+$ext = Join-Path $prog 'extension-chrome'; New-Item -ItemType Directory -Force -Path (Join-Path $ext 'iconos') | Out-Null
+Get-ChildItem -LiteralPath (Join-Path $proy 'chrome-extension') -File | Copy-Item -Destination $ext
+Copy-Item (Join-Path $proy 'chrome-extension\iconos\*.png') (Join-Path $ext 'iconos')
 
 try { [void][version]$Version } catch { throw "Versión inválida: $Version (formato 2026.10.22 o 2026.10.22.1)" }
 $version = $Version

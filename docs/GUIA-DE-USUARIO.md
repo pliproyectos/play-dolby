@@ -100,6 +100,13 @@ Los mismos archivos también se pueden reproducir con **VLC**, directo a la sali
 
 ### D. Función con la consola Qu-5
 
+**Con 8 fuentes estéreo** (lo más común): deja la consola configurada **una vez** con
+`CONSOLA-QU5\GUIA-QU5-8-ESTEREO.md`. Ahí van los 8 pares estéreo, la salida USB por Direct Out y cómo
+guardar el Show en una USB de la consola. Luego, en Play Dolby: **✦ PLI Espacial → «◆ 8 estéreo de la
+consola»**, que deja los 8 objetos listos (USB 1-2 … 15-16).
+
+Paso a paso general:
+
 1. **01**: la Qu-5 (ASIO). La consola trabaja a **96 kHz**; Play Dolby toma esa frecuencia.
 2. **02**: el receptor. **Perfil 7.1**.
 3. **03**: qué canal USB va a cada bocina, o déjalo a PLI Espacial (paso 4).

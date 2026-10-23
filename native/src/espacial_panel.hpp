@@ -204,6 +204,25 @@ void escenaRapida(int cual){
  if(panel)InvalidateRect(panel,&vista,FALSE);
 }
 
+// Consola con 8 fuentes estéreo (USB-QU5-PLAY-DOLBY/GUIA-QU5-8-ESTEREO.md): objeto k = USB (2k+1)-(2k+2)
+// estéreo, fijos y repartidos alrededor del domo; salidas directas en Silencio; Espacial encendido.
+void ochoEstereo(){
+ for(int k=0;k<pli::MaxObjetos;++k){
+  auto& o=engine.core.espacio.obj[k];
+  o.estereo=true;o.ancho=30;o.nivel=1;
+  fijaObjeto(k,0,float(k*45));
+  o.entrada=k*2;
+ }
+ for(int r=0;r<8;++r)SendMessage(routes[r],CB_SETCURSEL,0,0);
+ SendMessage(profileBox,CB_SETCURSEL,2,0);
+ if(!engine.core.espacio.activo)alterna();
+ sincronizaFilas();enableControls(true);
+ status(L"8 estéreo de la consola: objetos 1-8 = USB 1-2 … 15-16, repartidos cada 45°; salidas directas en Silencio. "
+        L"Elige la Qu-5 y el receptor y pulsa Iniciar. Para que la consola los mande, ver USB-QU5-PLAY-DOLBY\\GUIA-QU5-8-ESTEREO.md.");
+ log("ESPACIAL preset 8 estereo");
+ if(panel)InvalidateRect(panel,&vista,FALSE);
+}
+
 int objetosActivos(){int n=0;for(auto& o:engine.core.espacio.obj)if(o.entrada>=0)++n;return n;}
 
 void syncPrincipal(){
@@ -315,6 +334,7 @@ LRESULT CALLBACK windowProc(HWND h,UINT m,WPARAM w,LPARAM l){
   if(id==601&&cargaFicha()){InvalidateRect(h,nullptr,FALSE);sync();status(L"Ficha del domo recargada.");}
   if(id==602)guarda();
   if(id==603)carga();
+  if(id==604)ochoEstereo();
   return 0;
  }
  if(m==WM_LBUTTONDOWN){
@@ -385,6 +405,7 @@ void open(){
  child(L"BUTTON",L"↻  Recargar ficha",24,612,200,40,601,BS_OWNERDRAW|WS_TABSTOP);
  child(L"BUTTON",L"Guardar objetos",236,612,180,40,602,BS_OWNERDRAW|WS_TABSTOP);
  child(L"BUTTON",L"Cargar objetos",428,612,180,40,603,BS_OWNERDRAW|WS_TABSTOP);
+ child(L"BUTTON",L"◆  8 estéreo de la consola  (USB 1-2 … 15-16)",24,662,584,40,604,BS_OWNERDRAW|WS_TABSTOP);
  sincronizaFilas();
  info=child(L"STATIC",L"",624,600,370,112,0,0);
  SendMessage(info,WM_SETFONT,(WPARAM)smallFont,TRUE);

@@ -5,7 +5,7 @@ metadata:
   node_type: memory
   type: project
   originSessionId: d0c97d44-cdbe-4b6c-844f-da7a94ce1940
-  modified: 2026-10-22T18:58:44.043Z
+  modified: 2026-10-23T00:37:39.509Z
 ---
 
 Al 2026-10-20 el proyecto PARCHE DOLBY (planetario con domo 7.1) migra de PC: la PC del domo (GPU AMD) deja de usarse. El paquete completo va en la USB KINGSTON `D:\PARCHE DOLBY`, sincronizado y verificado con SHA-256. El `CLAUDE.md` de la raíz del proyecto es la memoria que viaja con el código; empezar por ahí.
@@ -65,6 +65,16 @@ Al 2026-10-20 el proyecto PARCHE DOLBY (planetario con domo 7.1) migra de PC: la
 - Actualizaciones con aviso (lo pidió Luis):
   - revisa al prender la PC y cada 12 h;
   - se publica con `native/publicar-version.ps1` más un Release `vAAAA.MM.DD` con el ZIP y su `.sha256`.
+- 2026-10-22, la Qu-5 tendrá 8 fuentes estéreo:
+  - guía en `USB-QU5-PLAY-DOLBY/GUIA-QU5-8-ESTEREO.md`;
+  - botón «◆ 8 estéreo de la consola» en el panel PLI Espacial.
+  - El Show de la Qu no se puede generar desde la PC: se configura una vez en la consola y se guarda en otra USB, porque la consola la formatea.
+- Captura del sonido de Windows (loopback) hecha y probada, pero en pausa por Luis: no está conectada a Play Dolby.
+- Para la música del navegador, Luis prefirió la extensión de Chrome `chrome-extension/`.
+  - El motor pasa 16/16 en render fuera de línea.
+  - Falta probarla en Chrome con el receptor.
+  - Luis pidió crear el Show de la Qu-5 desde la PC: es imposible sin una muestra, porque el formato no es público.
+  - Se le propuso guardar un Show «ORIGINAL» desde la consola para analizarlo; quedó pendiente.
 - Gotchas:
   - En PowerShell, `R` es un alias de `Invoke-History`: no llamar `R` a una función.
   - En PowerShell, `$null` pasado a una función de Windows llega como "": usar `[NullString]::Value` (FindWindow).

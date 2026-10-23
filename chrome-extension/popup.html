@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>PLI Espacial 7.1</title>
+<style>
+  :root { --fondo:#111119; --tarjeta:#181823; --borde:#2A2A3A; --texto:#F4F1FA; --suave:#969BAF; --acento:#C187FF; --vivo:#55F8B9; --boton:#A835F7; }
+  * { box-sizing: border-box; }
+  body { margin:0; width:330px; background:var(--fondo); color:var(--texto); font:13px "Segoe UI", system-ui, sans-serif; }
+  header { padding:14px 16px 10px; border-bottom:1px solid var(--borde); }
+  h1 { margin:0; font-size:16px; font-weight:600; }
+  h1 span { color:var(--acento); }
+  .estado { margin-top:6px; color:var(--suave); font-size:12px; min-height:16px; }
+  .estado.vivo { color:var(--vivo); }
+  .estado.aviso { color:#FFB84D; }
+  main { padding:12px 16px 16px; display:grid; gap:12px; }
+  button { width:100%; padding:10px; border-radius:8px; border:1px solid var(--borde); background:var(--tarjeta); color:var(--texto); font:inherit; cursor:pointer; }
+  button.principal { background:var(--boton); border-color:var(--acento); font-weight:600; }
+  button:hover { filter:brightness(1.15); }
+  label { display:grid; gap:4px; color:var(--suave); font-size:12px; }
+  select, input[type=range] { width:100%; }
+  select { padding:7px; border-radius:6px; background:var(--tarjeta); color:var(--texto); border:1px solid var(--borde); font:inherit; }
+  .fila { display:flex; gap:8px; align-items:center; color:var(--texto); }
+  .nota { color:var(--suave); font-size:11px; line-height:1.4; }
+</style>
+</head>
+<body>
+<header>
+  <h1>PLI Espacial <span>7.1</span></h1>
+  <div id="estado" class="estado">Comprobando…</div>
+</header>
+<main>
+  <button id="activar" class="principal">▶ Activar en esta pestaña</button>
+  <label>Modo
+    <select id="modo">
+      <option value="envolvente">Envolvente · frente + ambiente alrededor</option>
+      <option value="orbita">Órbita · la mezcla gira por el domo</option>
+      <option value="frente">Frente · estéreo tal cual (FL/FR)</option>
+    </select>
+  </label>
+  <label>Giro de la órbita
+    <select id="rpm">
+      <option value="1.5">Lento · 1,5 vueltas/min</option>
+      <option value="3" selected>Medio · 3 vueltas/min</option>
+      <option value="6">Rápido · 6 vueltas/min</option>
+      <option value="-3">Al revés · 3 vueltas/min</option>
+    </select>
+  </label>
+  <label>Nivel: <span id="nivelTxt">−6 dB</span>
+    <input id="nivel" type="range" min="-24" max="0" step="1" value="-6">
+  </label>
+  <div class="fila"><input id="lfe" type="checkbox"><span>Mandar graves al subwoofer (LFE)</span></div>
+  <button id="probar">◎ Probar canales (tono suave en cada bocina)</button>
+  <div class="nota">Windows debe tener la salida del receptor en <b>7.1</b> y como <b>predeterminada</b>.
+    Cierra Play Dolby: usa esa salida en exclusiva. Volumen del receptor bajo al probar.</div>
+</main>
+<script src="popup.js"></script>
+</body>
+</html>

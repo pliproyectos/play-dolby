@@ -284,6 +284,26 @@ bool start(bool test, int channel = -1);
 #include "fuente_ui.hpp"
 #include "actualizacion_ui.hpp"
 
+// Botón «Extensión Chrome 7.1»: abre INSTALAR-EXTENSION.bat (copia la extensión a la PC, pone la ruta en el
+// portapapeles y abre chrome://extensions). Instalado: <exe>\extension-chrome; en el proyecto: chrome-extension.
+void instalaExtension() {
+    wchar_t exe[MAX_PATH]; GetModuleFileNameW(nullptr, exe, MAX_PATH);
+    auto dir = std::filesystem::path(exe).parent_path();
+    std::filesystem::path bat = dir / L"extension-chrome" / L"INSTALAR-EXTENSION.bat";
+    if (!std::filesystem::exists(bat)) bat = (dir / L".." / L".." / L"chrome-extension" / L"INSTALAR-EXTENSION.bat").lexically_normal();
+    if (!std::filesystem::exists(bat)) { status(L"No encuentro la extensión de Chrome junto a Play Dolby (carpeta extension-chrome)."); return; }
+    wchar_t sys[MAX_PATH]; GetSystemDirectoryW(sys, MAX_PATH);
+    std::wstring cmd = L"\"" + std::wstring(sys) + L"\\cmd.exe\" /c \"\"" + bat.wstring() + L"\"\"";
+    STARTUPINFOW si{}; si.cb = sizeof(si); PROCESS_INFORMATION pi{};
+    if (!CreateProcessW(nullptr, cmd.data(), nullptr, nullptr, FALSE, CREATE_NEW_CONSOLE, nullptr, bat.parent_path().c_str(), &si, &pi)) {
+        status(L"No se pudo abrir el instalador de la extensión."); return;
+    }
+    CloseHandle(pi.hThread); CloseHandle(pi.hProcess);
+    log("EXTENSION instalador abierto");
+    status(L"Se abrió el instalador de la extensión: en Chrome activa Modo de desarrollador › Cargar descomprimida › Ctrl+V. "
+           L"La extensión y Play Dolby no suenan a la vez: detén el puente para usarla.");
+}
+
 void stop() {
     tester::cancel();
     engine.stop();
@@ -478,6 +498,7 @@ LRESULT CALLBACK proc(HWND h, UINT m, WPARAM w, LPARAM l) {
         if (id == 18) espacialUI::open();
         if (id == 19) espacialUI::alterna();
         if (id == 25) actualizacion::instalar();
+        if (id == 26) instalaExtension();
         if (id >= 20 && id < 24) espacialUI::escenaRapida(id - 20);
         if (id == 24 && code == CBN_SELCHANGE) {
             const float speeds[] = { 0.f, .25f, .5f, .75f, 1.f, 1.25f, 1.5f };
@@ -589,6 +610,7 @@ int WINAPI wWinMain(HINSTANCE inst, HINSTANCE, PWSTR, int) {
 
     // Actualizaciones con aviso: «Buscar actualizaciones», o resaltado «Actualización X · Instalar» si hay una lista.
     HWND botonActualizar = control(L"BUTTON", L"⟳  Buscar actualizaciones", 690, 18, 318, 35, 25, WS_TABSTOP);
+    control(L"BUTTON", L"◆  Extensión Chrome 7.1", 440, 18, 236, 35, 26, WS_TABSTOP);
 
     // Dynamic Space (PLI Espacial fase 3b), en la columna junto al domo: encendido, escenas rápidas y velocidad maestra.
     control(L"BUTTON", L"○  DYNAMIC SPACE", 974, 80, 216, 30, 19, WS_TABSTOP);

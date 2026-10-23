@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="es">
+<meta charset="utf-8">
+<title>Pruebas del motor PLI Espacial 7.1</title>
+<style>body{font:14px system-ui;background:#111119;color:#F4F1FA;padding:16px}pre{white-space:pre-wrap}.ok{color:#55F8B9}.falla{color:#FF6E96}</style>
+<h1>Pruebas del motor (render fuera de línea, 8 canales)</h1>
+<pre id="salida">Corriendo…</pre>
+<script src="../motor.js"></script>
+<script>
+(async () => {
+  const { Motor, vbap, CANALES } = PLIMotor;
+  const out = []; let fallas = 0, total = 0;
+  const check = (c, t) => { total++; if (!c) fallas++; out.push((c ? 'OK     ' : 'FALLA  ') + t); };
+  const SR = 48000, N = SR;  // 1 s
+
+  // Renderiza con un estéreo de prueba y devuelve el RMS de cada uno de los 8 canales (descarta 0,2 s).
+  async function render(conf, generaL, generaR, angulo) {
+    const ctx = new OfflineAudioContext(8, N, SR);
+    ctx.destination.channelCount = 8; ctx.destination.channelCountMode = 'explicit'; ctx.destination.channelInterpretation = 'discrete';
+    const buf = ctx.createBuffer(2, N, SR);
+    const l = buf.getChannelData(0), r = buf.getChannelData(1);
+    for (let i = 0; i < N; i++) { l[i] = generaL(i / SR); r[i] = generaR(i / SR); }
+    const src = ctx.createBufferSource(); src.buffer = buf;
+    const m = new Motor(ctx, src, ctx.destination);
+    m.configura(conf); if (angulo !== undefined) { m.angulo = angulo; } m.aplica(true);
+    src.start();
+    const res = await ctx.startRendering();
+    return CANALES.map((_, c) => { const d = res.getChannelData(c); let s = 0; for (let i = SR * 0.2; i < N; i++) s += d[i] * d[i]; return Math.sqrt(s / (N - SR * 0.2)); });
+  }
+  const db = (x) => (20 * Math.log10(x + 1e-12)).toFixed(1);
+  const fila = (t, v) => out.push('       ' + t.padEnd(26) + CANALES.map((c, i) => `${c} ${db(v[i])}`).join('  '));
+  const tono = (f, a) => (t) => a * Math.sin(2 * Math.PI * f * t);
+  const nada = () => 0;
+  const rmsL = 0.5 / Math.SQRT2;  // RMS del tono de 0,5
+
+  // VBAP
+  let peor = 0; for (let a = 0; a < 360; a += 0.5) { const g = vbap(a); peor = Math.max(peor, Math.abs(g.reduce((s, x) => s + x * x, 0) - 1)); if (g[3] !== 0) peor = 9; }
+  check(peor < 1e-9, 'VBAP: potencia constante y LFE en cero en toda la vuelta');
+  for (const [c, a] of PLIMotor.DOMO) { const g = vbap(a); check(Math.abs(g[c] - 1) < 1e-9, `VBAP: a ${a}° solo suena ${CANALES[c]}`); }
+
+  // Frente: L → FL, R → FR, nada más.
+  let v = await render({ modo: 'frente', nivelDb: 0 }, tono(1000, 0.5), nada);
+  fila('frente (solo L):', v);
+  check(Math.abs(v[0] - rmsL) < 0.01 && v.every((x, i) => i === 0 || x < 1e-4), 'frente: L completo en FL y silencio en el resto');
+  v = await render({ modo: 'frente', nivelDb: 0 }, nada, tono(1000, 0.5));
+  check(Math.abs(v[1] - rmsL) < 0.01 && v.every((x, i) => i === 1 || x < 1e-4), 'frente: R completo en FR');
+
+  // Envolvente: con L solo hay ambiente en laterales/traseras; con mono (L=R) el ambiente se cancela.
+  v = await render({ modo: 'envolvente', nivelDb: 0 }, tono(1000, 0.5), nada);
+  fila('envolvente (solo L):', v);
+  check(v[0] > 0.3 && v[2] > 0.01 && v[4] > 0.01 && v[5] > 0.01 && v[6] > 0.01 && v[7] > 0.01 && v[1] < 1e-4 && v[3] < 1e-4, 'envolvente: L al frente izquierdo, centro suave, ambiente en las 4 envolventes, LFE apagado');
+  v = await render({ modo: 'envolvente', nivelDb: 0 }, tono(1000, 0.5), tono(1000, 0.5));
+  fila('envolvente (mono L=R):', v);
+  check(v[4] < 1e-4 && v[5] < 1e-4 && v[6] < 1e-4 && v[7] < 1e-4 && v[2] > 0.05, 'envolvente: material mono (voz) queda al frente y al centro, sin ambiente');
+
+  // Órbita a 90°: L en 60° (FR/SR) y R en 120° (SR/BR).
+  v = await render({ modo: 'orbita', nivelDb: 0 }, tono(1000, 0.5), tono(1500, 0.5), 90);
+  fila('órbita a 90° (L y R):', v);
+  check(v[1] > 0.1 && v[7] > 0.1 && v[5] > 0.05 && v[0] < 0.02 && v[2] < 1e-4, 'órbita: a 90° la mezcla está a la derecha (FR, SR, BR) y no al frente izquierdo');
+
+  // LFE: apagado no hay nada; encendido llegan los graves (40 Hz) y no los agudos (1 kHz).
+  v = await render({ modo: 'envolvente', nivelDb: 0, lfe: false }, tono(40, 0.5), tono(40, 0.5));
+  check(v[3] < 1e-4, 'LFE apagado: el sub no recibe nada');
+  v = await render({ modo: 'envolvente', nivelDb: 0, lfe: true }, tono(40, 0.5), tono(40, 0.5));
+  const lfeGraves = v[3];
+  v = await render({ modo: 'envolvente', nivelDb: 0, lfe: true }, tono(1000, 0.5), tono(1000, 0.5));
+  check(lfeGraves > 0.1 && v[3] < 0.005, `LFE encendido: graves al sub (${db(lfeGraves)} dBFS) y casi nada de 1 kHz (${db(v[3])} dBFS)`);
+
+  // Nivel: −6 dB reduce a la mitad.
+  const v0 = await render({ modo: 'frente', nivelDb: 0 }, tono(1000, 0.5), nada);
+  const v6 = await render({ modo: 'frente', nivelDb: -6 }, tono(1000, 0.5), nada);
+  check(Math.abs(20 * Math.log10(v6[0] / v0[0]) + 6) < 0.3, `nivel: −6 dB baja ${(20 * Math.log10(v6[0] / v0[0])).toFixed(2)} dB`);
+
+  out.push('', `RESULTADO: ${fallas ? 'FALLA' : 'PASA'} (${total - fallas}/${total})`);
+  const el = document.getElementById('salida'); el.textContent = out.join('\n'); el.className = fallas ? 'falla' : 'ok';
+  document.title = fallas ? 'FALLA' : 'PASA';
+})().catch((e) => { document.getElementById('salida').textContent = 'ERROR: ' + e.stack; document.title = 'ERROR'; });
+</script>
+</html>
