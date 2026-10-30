@@ -14,3 +14,5 @@ El ZIP del Release trae el EXE y la extensión; excluye los WAV de demos y músi
 La fuente actualizada que produjo el EXE del 28 de octubre permanece en la otra computadora. El `native/src` disponible es anterior y no reconstruye el binario actual. La prueba física prolongada con Qu-5 y el receptor sigue pendiente.
 
 Lee [el estado y los pasos de uso](docs/ESTADO-ACTUAL-2026-10-30.md).
+
+El [refuerzo del central hacia FL/FR](docs/REFUERZO-CENTRAL-PENDIENTE.md) tiene un módulo probado para integrar cuando llegue la fuente actual del EXE. Todavía no forma parte de la aplicación publicada.
