@@ -8,6 +8,9 @@
   * { box-sizing: border-box; }
   body { margin:0; width:330px; background:var(--fondo); color:var(--texto); font:13px "Segoe UI", system-ui, sans-serif; }
   header { padding:14px 16px 10px; border-bottom:1px solid var(--borde); }
+  .logo { width:100%;height:auto;display:block;background:white;border-radius:8px;margin-bottom:12px; }
+  button:disabled { opacity:.5;cursor:default; }
+  #detalle { white-space:pre-wrap;font-size:11px;color:var(--suave); }
   h1 { margin:0; font-size:16px; font-weight:600; }
   h1 span { color:var(--acento); }
   .estado { margin-top:6px; color:var(--suave); font-size:12px; min-height:16px; }
@@ -26,19 +29,29 @@
 </head>
 <body>
 <header>
+  <img class="logo" src="assets/pli-logo.png" alt="PLI Ingeniería Aplicada">
   <h1>PLI Espacial <span>7.1</span></h1>
   <div id="estado" class="estado">Comprobando…</div>
 </header>
 <main>
   <button id="activar" class="principal">▶ Activar en esta pestaña</button>
+  <label>Salida
+    <select id="destino">
+      <option value="app" selected>Con Qu-5 / Play Dolby · ambas fuentes juntas</option>
+      <option value="directo">Solo Chrome · puente del EXE detenido</option>
+    </select>
+  </label>
   <label>Modo
     <select id="modo">
-      <option value="envolvente">Envolvente · frente + ambiente alrededor</option>
-      <option value="orbita">Órbita · la mezcla gira por el domo</option>
+      <option value="inteligente">PLI Espacial · ambiente guiado por el ritmo</option>
+      <option value="envolvente" selected>Envolvente · frente + ambiente alrededor</option>
+      <option value="pasada">Música clásica</option>
+      <option value="orbitaEnvolvente">Órbita envolvente · base continua + movimiento</option>
+      <option value="orbita">Órbita original · la mezcla gira por el domo</option>
       <option value="frente">Frente · estéreo tal cual (FL/FR)</option>
     </select>
   </label>
-  <label>Giro de la órbita
+  <label>Velocidad del movimiento
     <select id="rpm">
       <option value="1.5">Lento · 1,5 vueltas/min</option>
       <option value="3" selected>Medio · 3 vueltas/min</option>
@@ -49,10 +62,13 @@
   <label>Nivel: <span id="nivelTxt">−6 dB</span>
     <input id="nivel" type="range" min="-24" max="0" step="1" value="-6">
   </label>
-  <div class="fila"><input id="lfe" type="checkbox"><span>Mandar graves al subwoofer (LFE)</span></div>
+  <div class="fila"><input id="lfe" type="checkbox"><span>Mandar graves a SUB</span></div>
+  <button id="espacial">✦ Abrir PLI Espacial</button>
+  <button id="recuperar" hidden>↻ Reconectar Chrome</button>
+  <button id="diagnostico">Ver diagnóstico de conexión</button>
+  <div id="detalle" hidden></div>
   <button id="probar">◎ Probar canales (tono suave en cada bocina)</button>
-  <div class="nota">Windows debe tener la salida del receptor en <b>7.1</b> y como <b>predeterminada</b>.
-    Cierra Play Dolby: usa esa salida en exclusiva. Volumen del receptor bajo al probar.</div>
+  <div class="nota">Para escuchar Chrome y la Qu-5 juntos, inicia el puente en Play Dolby y usa «Con Qu-5 / Play Dolby». La app mezcla las dos fuentes y controla el HDMI. «Solo Chrome» funciona con el puente del EXE detenido y Windows en 7.1.</div>
 </main>
 <script src="popup.js"></script>
 </body>

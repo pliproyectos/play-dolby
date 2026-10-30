@@ -1,0 +1,56 @@
+PLAY DOLBY - PLI Ingenieria Aplicada
+(Guia completa con capturas: GUIA-DE-USUARIO.md, o "Guia de usuario" en el menu Inicio)
+Audio 7.1 para el domo: consola Qu-5 -> PC -> HDMI -> receptor, con PLI Espacial
+(objetos que se mueven por el domo).
+
+INSTALAR (Windows 10/11 de 64 bits)
+  1. Doble clic en  INSTALAR.cmd
+  2. Listo: acceso "Play Dolby" en el Escritorio y en el menu Inicio.
+  - No pide administrador ni internet. Se instala en %LOCALAPPDATA%\Programs\Play Dolby
+  - Para quitarlo: Configuracion > Aplicaciones > Aplicaciones instaladas > Play Dolby
+    (o "Desinstalar Play Dolby" en el menu Inicio).
+  - Si reinstalas, se conserva tu domo.json.
+
+SIN INSTALAR
+  Doble clic en  ABRIR SIN INSTALAR.cmd  (corre desde la USB).
+
+ANTES DE LA PRIMERA PRUEBA EN UNA PC
+  1. Windows en 7.1: Panel de sonido (mmsys.cpl) > la salida HDMI del receptor > Configurar >
+     "7.1 Surround". NO elegir "Dolby Atmos". Cerrar FxSound / Nahimic si estan abiertos.
+     El acceso "Diagnostico de audio" del menu Inicio dice si quedo bien (8 canales, 0x63F).
+  2. Consola Qu-5: instalar el controlador oficial de Allen & Heath (Qu-5/6/7, ASIO x64):
+     https://www.allen-heath.com/hardware/qu/qu-5-qu-5d/resources/
+     Con la consola conectada: "Prueba de hardware" en el menu Inicio debe decir PASA.
+  3. VOLUMEN DEL RECEPTOR BAJO al probar.
+
+DEMO (carpeta demo, tambien en el menu Inicio: "Demo y pruebas 7.1")
+  pruebas-7.1\   Senales para revisar la sala. Empieza por:
+                   00-tonos por bocina      un tono por bocina
+                   01-identificacion        una voz dice cada bocina y suena solo esa
+                   02-vuelta-al-domo        un ruido gira: un salto = canales cruzados
+                   05-rutina-apertura       revision rapida antes de cada funcion
+                 04-calibracion es FUERTE (para sonometro). Guia: LEEME-pruebas.md y hoja-de-campo.html
+  musica-7.1\    Cosmic y Cosmic Remix ya mezcladas en 7.1 (PLI Espacial, orbita, conservador...).
+  capas-cosmic\  Las 6 capas de Cosmic para mover en vivo con PLI Espacial.
+
+USO RAPIDO
+  01 Conecta tu consola: la Qu-5 (ASIO). Sin consola:
+       "Archivo WAV..."      -> un WAV 7.1 de demo\pruebas-7.1 o demo\musica-7.1: suena tal cual
+                                (Play Dolby pone solo el ruteo 1 a 1, perfil 7.1 y Espacial apagado)
+       "Carpeta de capas..." -> elige  demo\capas-cosmic  (arma 6 objetos que se mueven solos)
+       Tambien se pueden reproducir con VLC directo a la salida HDMI del receptor.
+  02 Elige tu receptor HDMI (WASAPI).
+  03 Asigna cada salida (o dejalo a PLI Espacial).
+  04 Iniciar puente. Ganancia inicial 0 dB. Perfil fijo 7.1.
+  Dynamic Space (arriba a la derecha): encender, escenas rapidas, velocidad maestra.
+  Boton "PLI Espacial": arrastrar los objetos por el domo.
+
+FICHA DEL DOMO
+  domo.json (junto a PlayDolby.exe) dice el angulo de cada bocina. Al medir los angulos reales
+  en sala, editar ese archivo y pulsar "Recargar ficha" en el panel PLI Espacial.
+
+HERRAMIENTAS (carpeta herramientas)
+  escena71 (escena JSON -> WAV 7.1), adm71 (ADM), capas71 (cancion -> capas), iamf71 (IAMF),
+  diagnostico-audio.ps1, prueba-hardware.cmd. Uso detallado en el proyecto (README.md / CLAUDE.md).
+
+Perfil y bitacora del programa: %LOCALAPPDATA%\PlanetarioBridge

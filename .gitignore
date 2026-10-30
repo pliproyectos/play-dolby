@@ -8,7 +8,17 @@ native/tools/ear-venv/
 # Compilación (native/build-*.ps1). portaudio.dll y el logo se copian solos desde vendor/ y assets/
 native/.zig-cache*/
 native/zig-out/
-native/bin/
+native/bin/*
+!native/bin/PlayDolby.exe
+!native/bin/portaudio.dll
+!native/bin/assets/
+!native/bin/guia/
+!native/bin/herramientas/
+!native/bin/*.json
+!native/bin/*.txt
+!native/bin/*.md
+!native/bin/*.ps1
+!native/bin/*.bat
 *.pdb
 
 # Salidas generadas

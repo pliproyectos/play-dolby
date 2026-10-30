@@ -22,7 +22,7 @@
     for (let i = 0; i < N; i++) { l[i] = generaL(i / SR); r[i] = generaR(i / SR); }
     const src = ctx.createBufferSource(); src.buffer = buf;
     const m = new Motor(ctx, src, ctx.destination);
-    m.configura(conf); if (angulo !== undefined) { m.angulo = angulo; } m.aplica(true);
+    m.configura(conf); if (conf.giro) m.iniciaGiro(); if (angulo !== undefined) { m.angulo = angulo; } m.aplica(true);
     src.start();
     const res = await ctx.startRendering();
     return CANALES.map((_, c) => { const d = res.getChannelData(c); let s = 0; for (let i = SR * 0.2; i < N; i++) s += d[i] * d[i]; return Math.sqrt(s / (N - SR * 0.2)); });
@@ -59,6 +59,23 @@
   check(v[1] > 0.1 && v[7] > 0.1 && v[5] > 0.05 && v[0] < 0.02 && v[2] < 1e-4, 'órbita: a 90° la mezcla está a la derecha (FR, SR, BR) y no al frente izquierdo');
 
   // LFE: apagado no hay nada; encendido llegan los graves (40 Hz) y no los agudos (1 kHz).
+  for (const angulo of [0, 45, 90, 180, 270]) {
+    v = await render({ modo: 'orbitaEnvolvente', nivelDb: 0 }, tono(1000, 0.5), tono(1000, 0.5), angulo);
+    check(v.every((x, c) => c === 3 ? x < 1e-4 : x > 0.1), `órbita envolvente mono a ${angulo}°: siete bocinas activas y LFE apagado`);
+  }
+  let matrizSegura = true;
+  for (let angulo = 0; angulo < 360; angulo += 0.5) {
+    const [l, r] = PLIMotor.orbitaEnvolvente(angulo, 30);
+    matrizSegura &&= l.every((x, c) => Number.isFinite(x) && x >= 0 && r[c] >= 0 && x + r[c] <= 1 + 1e-12);
+  }
+  check(matrizSegura, 'órbita envolvente: sin sobrecarga de matriz en toda la vuelta, incluso con mono a escala completa');
+  const nuevo = await render({ modo: 'orbitaEnvolvente', nivelDb: 0 }, tono(1000, 0.5), tono(1500, 0.5), 90);
+  check(nuevo[7] > nuevo[6], 'órbita envolvente a 90°: foco a la derecha conservando la izquierda');
+  const energia = (r) => r.reduce((s, x) => s + x * x, 0);
+  const referencia = await render({ modo: 'frente', nivelDb: 0 }, tono(1000, 0.5), tono(1500, 0.5));
+  check(energia(nuevo) >= energia(referencia), 'órbita envolvente: energía total no inferior al estéreo de referencia');
+
+  // LFE: apagado no hay nada; encendido llegan los graves (40 Hz) y no los agudos (1 kHz).
   v = await render({ modo: 'envolvente', nivelDb: 0, lfe: false }, tono(40, 0.5), tono(40, 0.5));
   check(v[3] < 1e-4, 'LFE apagado: el sub no recibe nada');
   v = await render({ modo: 'envolvente', nivelDb: 0, lfe: true }, tono(40, 0.5), tono(40, 0.5));
@@ -66,11 +83,31 @@
   v = await render({ modo: 'envolvente', nivelDb: 0, lfe: true }, tono(1000, 0.5), tono(1000, 0.5));
   check(lfeGraves > 0.1 && v[3] < 0.005, `LFE encendido: graves al sub (${db(lfeGraves)} dBFS) y casi nada de 1 kHz (${db(v[3])} dBFS)`);
 
+  for (const a of [0, 90, 180, 270]) {
+    const paso = await render({ modo: 'pasada', nivelDb: 0 }, tono(1000, 0.5), tono(1000, 0.5), a);
+    check(paso.every((x,c) => c === 3 ? x < 1e-4 : x > 0.1 && x <= rmsL + 0.001), `pasada ${a}°: base continua, sin sobrecarga mono`);
+  }
+  const der = await render({ modo: 'pasada', nivelDb: 0 }, tono(1000, 0.5), tono(1000, 0.5), 90);
+  const izq = await render({ modo: 'pasada', nivelDb: 0 }, tono(1000, 0.5), tono(1000, 0.5), 270);
+  check(der[7] > der[6] && izq[6] > izq[7], 'pasada: alterna el acento entre ambos lados');
   // Nivel: −6 dB reduce a la mitad.
   const v0 = await render({ modo: 'frente', nivelDb: 0 }, tono(1000, 0.5), nada);
   const v6 = await render({ modo: 'frente', nivelDb: -6 }, tono(1000, 0.5), nada);
   check(Math.abs(20 * Math.log10(v6[0] / v0[0]) + 6) < 0.3, `nivel: −6 dB baja ${(20 * Math.log10(v6[0] / v0[0])).toFixed(2)} dB`);
 
+  for (const a of [0,90,180,270]) {
+    const voz = await render({modo:'inteligente',nivelDb:0,giro:true,intensidad:1},tono(1000,.5),tono(1000,.5),a);
+    check(voz[0] > .28 && voz[1] > .28 && voz[2] < voz[0]/2 && voz.slice(4).every(x=>x<1e-4), `inteligente ${a}°: voz común en FL/FR, no gira ni depende del centro`);
+  }
+  const fijo = await render({modo:'inteligente',nivelDb:0},tono(1000,.5),tono(1000,-.5),90);
+  const movil = await render({modo:'inteligente',nivelDb:0,giro:true,intensidad:1},tono(1000,.5),tono(1000,-.5),90);
+  check(Math.abs(movil[7]-fijo[7])>.01 && Math.abs(movil[0]-fijo[0])<.001, 'inteligente: el ambiente cambia de destino sin retirar el frente');
+  const ritmo = new PLIMotor.Ritmo();
+  for(let i=0;i<500;i++) ritmo.agrega(i*.04,[i%12===0?.2:0,0,0],.5);
+  check(Math.abs(ritmo.datos.bpm-125)<=1 && ritmo.datos.confianza>.8, 'ritmo: detecta pulsos sintéticos de 125 BPM');
+  check(ritmo.frames.length<=301 && ritmo.datos.buffer<=12, 'buffer: historial limitado a 12 segundos');
+  for(let i=500;i<850;i++) ritmo.agrega(i*.04,[0,0,0],0);
+  check(ritmo.datos.bpm===0 && !ritmo.datos.golpe, 'silencio: descarta tempo obsoleto');
   out.push('', `RESULTADO: ${fallas ? 'FALLA' : 'PASA'} (${total - fallas}/${total})`);
   const el = document.getElementById('salida'); el.textContent = out.join('\n'); el.className = fallas ? 'falla' : 'ok';
   document.title = fallas ? 'FALLA' : 'PASA';

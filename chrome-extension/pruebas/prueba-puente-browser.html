@@ -1,0 +1,27 @@
+<!doctype html><meta charset="utf-8"><title>Prueba silenciosa del puente</title>
+<pre id="resultado">ESPERANDO</pre>
+<script>
+(async () => {
+  let ctx;
+  try {
+    ctx = new AudioContext({ sampleRate: 48000, sinkId: { type: 'none' } });
+    if (!ctx.sinkId || ctx.sinkId.type !== 'none') throw Error('Sink silencioso no disponible');
+    await ctx.audioWorklet.addModule('../pcm-worklet.js');
+    const node = new AudioWorkletNode(ctx, 'pli-pcm', { numberOfInputs: 1, numberOfOutputs: 1,
+      outputChannelCount: [1], channelCount: 8, channelCountMode: 'explicit', channelInterpretation: 'discrete' });
+    const merge = ctx.createChannelMerger(8); merge.connect(node); node.connect(ctx.destination);
+    for (let c = 0; c < 8; c++) { const source = ctx.createConstantSource(); source.offset.value = (c + 1) / 16; source.connect(merge, 0, c); source.start(); }
+    const bloque = new Promise((resolve, reject) => {
+      node.port.onmessage = ({data}) => resolve(data);
+      setTimeout(() => reject(Error('No llegó audio del worklet')), 2500);
+    });
+    await ctx.resume();
+    const data = await bloque;
+    if (data.rate !== 48000 || data.pcm.length !== 8192) throw Error('Formato inesperado');
+    // El último cuadro evita la puesta en marcha inicial del grafo.
+    for (let c = 0; c < 8; c++) if (Math.abs(data.pcm[8184 + c] - (c + 1) / 16) > 1e-6) throw Error('Canal incorrecto: ' + c);
+    document.getElementById('resultado').textContent = 'PASA: Chrome real, sink none, 48000 Hz, worklet ocho canales discretos';
+  } catch (e) { document.getElementById('resultado').textContent = 'FALLA: ' + e.message; }
+  finally { if (ctx) await ctx.close(); }
+})();
+</script>

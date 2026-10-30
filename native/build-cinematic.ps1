@@ -1,4 +1,4 @@
-param([string]$OutputName='PlayDolby.exe')
+param([string]$OutputName='PlayDolby-Desarrollo.exe')
 $ErrorActionPreference='Stop'
 $env:ZIG_GLOBAL_CACHE_DIR=Join-Path $PSScriptRoot '.zig-cache-global'
 $env:ZIG_LOCAL_CACHE_DIR=Join-Path $PSScriptRoot '.zig-cache-local'

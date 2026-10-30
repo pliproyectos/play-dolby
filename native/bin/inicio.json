@@ -1,0 +1,16 @@
+{
+  "entrada": "Qu ASIO Driver",
+  "iniciar_audio": true,
+  "rutas_usb": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+  ],
+  "intervalo_segundos": 5,
+  "salida_contiene": "INTEGRA"
+}

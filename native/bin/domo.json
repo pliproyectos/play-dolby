@@ -1,0 +1,21 @@
+{
+  "_que_es": "Ficha del domo: fuente única del mapeo canal -> bocina. Todo el kit se genera desde aquí.",
+  "estado": "PROVISIONAL — ángulos nominales de una sala 7.1 (sin medir). Reemplazar con lo medido en el domo.",
+  "fecha": "2026-10-20",
+  "convencion_azimut": "grados, 0 = frente (centro), positivo hacia la derecha (sentido horario visto desde arriba)",
+  "proteccion": {
+    "pico_max_dbfs": -3.0,
+    "rms_max_dbfs": -20.0,
+    "_nota": "El generador se niega a escribir por encima de estos límites."
+  },
+  "canales": [
+    {"id": "FL",  "voz": "Frontal izquierdo", "receptor": "Front L",          "azimut": -30,  "elevacion": 0, "distancia_m": null},
+    {"id": "FR",  "voz": "Frontal derecho",   "receptor": "Front R",          "azimut": 30,   "elevacion": 0, "distancia_m": null},
+    {"id": "FC",  "voz": "Central",           "receptor": "Center",           "azimut": 0,    "elevacion": 0, "distancia_m": null},
+    {"id": "LFE", "voz": "Subgrave",          "receptor": "Subwoofer",        "azimut": null, "elevacion": null, "distancia_m": null},
+    {"id": "BL",  "voz": "Trasero izquierdo", "receptor": "Surround Back L",  "azimut": -145, "elevacion": 0, "distancia_m": null},
+    {"id": "BR",  "voz": "Trasero derecho",   "receptor": "Surround Back R",  "azimut": 145,  "elevacion": 0, "distancia_m": null},
+    {"id": "SL",  "voz": "Lateral izquierdo", "receptor": "Surround L",       "azimut": -100, "elevacion": 0, "distancia_m": null},
+    {"id": "SR",  "voz": "Lateral derecho",   "receptor": "Surround R",       "azimut": 100,  "elevacion": 0, "distancia_m": null}
+  ]
+}

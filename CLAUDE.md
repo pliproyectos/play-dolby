@@ -1,3 +1,9 @@
+# Estado vigente — 2026-10-29
+
+La versión operativa es native/bin/PlayDolby.exe, copiada de la USB de Luis (EXE 2026.10.28.1). Su fuente actualizada está pendiente de traer desde la otra computadora. NO reemplazar ese binario con una compilación de native/src anterior. La extensión está en chrome-extension/, versión 2026.10.29.3. Leer README.md y docs/ESTADO-ACTUAL-2026-10-29.md antes de trabajar. Las propuestas históricas y respaldos duplicados se retiraron por petición de Luis; Git conserva su historial.
+
+---
+
 # PARCHE DOLBY — contexto para Claude
 
 Planetario con domo 7.1. Cadena: consola **Allen & Heath Qu-5** → USB/ASIO → PC Windows con
