@@ -1,2 +1,2 @@
-2026.10.29.3
-Paquete USB: EXE local 2026.10.28.1 conservado; extension 2026.10.29.3 con logo y recuperacion de conexion.
+2026.10.30.1
+Paquete con generador local PCM 24 bit. EXE recibido 2026.10.28.1 sin cambios. Extension 2026.10.29.3.

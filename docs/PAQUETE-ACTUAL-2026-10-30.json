@@ -1,12 +1,12 @@
 {
-  "version_paquete": "2026.10.29.3",
+  "version_paquete": "2026.10.30.1",
   "version_exe_recibido": "2026.10.28.1",
   "fuentes_exe_actual": "Pendientes: permanecen en la otra PC",
   "archivos": [
     {
       "archivo": "VERSION.txt",
-      "bytes": 122,
-      "sha256": "9e11fc372113852e7e2103d9ed19f2fa00582d11540351160a3add126c3324d7"
+      "bytes": 118,
+      "sha256": "c957d859f004dfead14df5567683aa67889f3e1f8da85e6151eca6af459825ed"
     },
     {
       "archivo": "actualizacion.json",
@@ -40,8 +40,8 @@
     },
     {
       "archivo": "LEEME.txt",
-      "bytes": 3340,
-      "sha256": "d37c5fafe71d7ada5a8cffb6a766ad6af8bca977aad68e944f2d1ee91bed3ac2"
+      "bytes": 3820,
+      "sha256": "9227b54aae8085dae4d075719dc5b936393d0a7902f9cf9209716d0d13fa7916"
     },
     {
       "archivo": "PlayDolby.exe",
@@ -59,11 +59,6 @@
       "sha256": "ac2040a71eb0f9902d22c8e07af99a9083a57c110fa74841d9a35ad0f9bba977"
     },
     {
-      "archivo": "LEER-PRIMERO-2026-10-29.md",
-      "bytes": 3889,
-      "sha256": "db5226838f854ffd5119b25c35b2ad7f06aa2704c9fe0b8d07443c3628b30600"
-    },
-    {
       "archivo": "ACTUALIZAR-EXTENSION.bat",
       "bytes": 104,
       "sha256": "2d247e7aeeb889e519f7be63f867fc49229fde7b7accd3762118b0e9304efd9e"
@@ -72,6 +67,11 @@
       "archivo": "ABRIR-PLAY-DOLBY.bat",
       "bytes": 61,
       "sha256": "d635bda59877b192ead162d6c746b24cb6b5798254a802dc56fa47b5448f9893"
+    },
+    {
+      "archivo": "GENERAR-PRUEBAS-7.1.bat",
+      "bytes": 156,
+      "sha256": "d57291a8aca6dc5afeb245a89ce36e460b9b039ed410bc3e1db31e7b896ac588"
     },
     {
       "archivo": "assets/pli-logo.png",
@@ -149,11 +149,6 @@
       "sha256": "59b524da91c475b587f0320b19625186417f9198ec6d08ba72ad6968cb23940b"
     },
     {
-      "archivo": "demo/prueba-7.1.wav",
-      "bytes": 19200068,
-      "sha256": "a0a06da2cbc13e51745cec722ba8a1978bd922916a0cff02a2097e25d31973df"
-    },
-    {
       "archivo": "guia/GUIA-DE-USUARIO.md",
       "bytes": 13833,
       "sha256": "acbc020ce71383e5b00d903f24ed55f1760b8b0eead7798ea7533dee794e5f43"
@@ -217,6 +212,21 @@
       "archivo": "herramientas/upmix71.exe",
       "bytes": 829952,
       "sha256": "0bb38040b4a2f3795ff30201f3555f1414f51d90ad1388e469e338f43747cf2e"
+    },
+    {
+      "archivo": "herramientas/GENERAR-PRUEBAS-7.1.cs",
+      "bytes": 4305,
+      "sha256": "5446fd9d712dd52a53832f897fc24b445fc092aca8e1ca70c1eee698a0e5a622"
+    },
+    {
+      "archivo": "herramientas/GENERAR-PRUEBAS-7.1.ps1",
+      "bytes": 2035,
+      "sha256": "c5749e5847562ddaed233e723dbc8d35526c72938fbf49db9ce1e876814d00c2"
+    },
+    {
+      "archivo": "herramientas/GENERAR-PRUEBAS-7.1.bat",
+      "bytes": 650,
+      "sha256": "f3f62711b754f1fd0ff727b2546ca2be71a54f47f13d8e632e4a40d290198443"
     },
     {
       "archivo": "chrome-extension/iconos/128.png",
@@ -284,136 +294,6 @@
       "sha256": "d25a3d22dc3bd0c204d6200ab705ece8cbebfefc1c2c26363a01cab318a74a3e"
     },
     {
-      "archivo": "demo/capas-cosmic/bajo.wav",
-      "bytes": 50626604,
-      "sha256": "0f03d93a65d53e1f9ad74627cfb49addc2ffd39f5f6f9f97f2a724bfd4adeeab"
-    },
-    {
-      "archivo": "demo/capas-cosmic/bombo.wav",
-      "bytes": 50626604,
-      "sha256": "d910ab3ade5999701237d4a774916aa4cd5aa3eac43bbeb360d23b386b0ce0fd"
-    },
-    {
-      "archivo": "demo/capas-cosmic/brillos.wav",
-      "bytes": 50626604,
-      "sha256": "4a68eb7ab2adab32d2275c8e472b075f7ae31756db667c763e37e8e9d6e1d0aa"
-    },
-    {
-      "archivo": "demo/capas-cosmic/colchon.wav",
-      "bytes": 50626604,
-      "sha256": "2d5d28d30038f938bc948363d36bd7918a76da23163cf86227aba0fc10fb02b9"
-    },
-    {
-      "archivo": "demo/capas-cosmic/percusion.wav",
-      "bytes": 50626604,
-      "sha256": "d71a5ab078a45d3c5c6cd492de6698d4b5686a74d2d11b82e1fba14dd860b646"
-    },
-    {
-      "archivo": "demo/capas-cosmic/voz.wav",
-      "bytes": 50626604,
-      "sha256": "bb7770928ddfad8f8b2a1e353b4dd426bdd8bda7bab3b090bfb1ff1f67992208"
-    },
-    {
-      "archivo": "demo/musica-7.1/Cosmic - PLI Espacial (instrumentos que se mueven).wav",
-      "bytes": 202506308,
-      "sha256": "180b895d817461cb8e0e6d5b344eeec235a7b49ccf292f136491496532745221"
-    },
-    {
-      "archivo": "demo/musica-7.1/Cosmic - PLI Espacial estable (sin aceleron).wav",
-      "bytes": 202506308,
-      "sha256": "1b7296fd7210354593499e9e97268db33bd3c83f7f9a38cbadfe766d26c2aa34"
-    },
-    {
-      "archivo": "demo/musica-7.1/Cosmic Remix - conservador.wav",
-      "bytes": 201670724,
-      "sha256": "86080fa9f8c813d288f304caf9e36cfbe5ede5a156daa3f6b7098d6b7d29dd57"
-    },
-    {
-      "archivo": "demo/musica-7.1/Cosmic Remix - instrumentos (anillo clasico).wav",
-      "bytes": 201670724,
-      "sha256": "769c72a362c0778e3a432a5ad0be5422fe0e55c0d5b6507323e321895c507bf0"
-    },
-    {
-      "archivo": "demo/musica-7.1/Cosmic Remix - orbita (toda la mezcla gira).wav",
-      "bytes": 201670724,
-      "sha256": "355051d0e3fec5c25272ed19100a53f22601924b5b4753062f6452b84bb4b1ad"
-    },
-    {
-      "archivo": "demo/musica-7.1/Cosmic Remix - PLI Espacial.wav",
-      "bytes": 201670724,
-      "sha256": "5510784d655b06aa401af30b7a8a7dc14294934a4f440760c0a17ad6a167ea0d"
-    },
-    {
-      "archivo": "demo/pruebas-7.1/00-tonos por bocina.wav",
-      "bytes": 19200068,
-      "sha256": "a0a06da2cbc13e51745cec722ba8a1978bd922916a0cff02a2097e25d31973df"
-    },
-    {
-      "archivo": "demo/pruebas-7.1/01-identificacion.wav",
-      "bytes": 46858316,
-      "sha256": "d8cbcff038e8218df6c9ae2889bfd7c3b0129dab574cb619675e569770a82664"
-    },
-    {
-      "archivo": "demo/pruebas-7.1/02-vuelta-al-domo.wav",
-      "bytes": 65486060,
-      "sha256": "5b65e134653b810585fa0472c4592aff567fe8623b3419826a114cc1fa704d55"
-    },
-    {
-      "archivo": "demo/pruebas-7.1/03-polaridad.wav",
-      "bytes": 95399084,
-      "sha256": "2e9ee37499ff0223fa61d799c24a655dea79cc223c1d19581b7d9f28700cd736"
-    },
-    {
-      "archivo": "demo/pruebas-7.1/04-calibracion (FUERTE, -20 dBFS - para sonometro).wav",
-      "bytes": 214589516,
-      "sha256": "5a07f5e34a2ad9f9d1760413aff2d1f2eb8a679e4a66eb942afc8d04b14f7ef9"
-    },
-    {
-      "archivo": "demo/pruebas-7.1/05-rutina-apertura.wav",
-      "bytes": 37972796,
-      "sha256": "d1a9340f15004a2eaede724feef6148011087888c37d92cc026efe9d353daceb"
-    },
-    {
-      "archivo": "demo/pruebas-7.1/06-ref-5.1-laterales.wav",
-      "bytes": 21506954,
-      "sha256": "c9af3729d1dc55ee5ee0688105e2e370bfc13df8cb08855b50cf961624ccbb07"
-    },
-    {
-      "archivo": "demo/pruebas-7.1/06-ref-5.1.wav",
-      "bytes": 21535412,
-      "sha256": "41510069e2cdfff2682e857f1f771c4c6aad9c7f8ab6b28bd151418ab8b6e472"
-    },
-    {
-      "archivo": "demo/pruebas-7.1/06-ref-7.1.wav",
-      "bytes": 35392988,
-      "sha256": "4157c7d3c29fffc9f53d51d14571460df41937d9caa10b45cc64ce7e8abee96c"
-    },
-    {
-      "archivo": "demo/pruebas-7.1/06-ref-estereo.wav",
-      "bytes": 2897630,
-      "sha256": "0fba353d56a17f5e2a0e75e981a0cb6d1d2a5f717710c49bbee1a7f57a804956"
-    },
-    {
-      "archivo": "demo/pruebas-7.1/06-ref-mono.wav",
-      "bytes": 781110,
-      "sha256": "ff438a87322fdd4f20cfd7eb1a8fa5cf3c223122dc60cc20449eac2459adeada"
-    },
-    {
-      "archivo": "demo/pruebas-7.1/GUION.md",
-      "bytes": 8518,
-      "sha256": "b94c0d0b91f622de03327c7f89face206b160e58b625935f4cb1e7ee0fb132ee"
-    },
-    {
-      "archivo": "demo/pruebas-7.1/hoja-de-campo.html",
-      "bytes": 8025,
-      "sha256": "0254d1cb2a21fbf543eed5c1196e1c6c2bbe92f3445479533bc4090403cc024f"
-    },
-    {
-      "archivo": "demo/pruebas-7.1/LEEME-pruebas.md",
-      "bytes": 5983,
-      "sha256": "7c4acddaf9b0ed6f1535575c2c2d900f9df572a5c723993b9db0b74c7562d158"
-    },
-    {
       "archivo": "guia/img/01-principal.png",
       "bytes": 251935,
       "sha256": "31c496bc7566ed30c3ce85b128b00c031ee45841a46c8a433cbc7070668d4c58"
@@ -432,6 +312,16 @@
       "archivo": "guia/img/04-panel-pli-espacial.png",
       "bytes": 85542,
       "sha256": "504f5633c64c5dd89e02da06a79c52451a4e4c0a57de3cae9f615116165148a4"
+    },
+    {
+      "archivo": "LEER-PRIMERO.md",
+      "bytes": 1645,
+      "sha256": "75c3a70cea8a8269c9f151ef360a3519b74b690499f627454962e4d31fe80727"
     }
-  ]
+  ],
+  "archivos_wav_locales_no_publicados": {
+    "cantidad": 24,
+    "bytes_en_usb_local": 2096275138,
+    "incluidos_en_github": false
+  }
 }

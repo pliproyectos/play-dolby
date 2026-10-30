@@ -1,6 +1,6 @@
 # Documentación del código anterior al EXE recibido
 
-Este documento describe el código fuente previo. Para usar la versión actual, consultar README.md y docs/ESTADO-ACTUAL-2026-10-29.md.
+Este documento describe el código fuente previo. Para usar la versión actual, consultar README.md y docs/ESTADO-ACTUAL-2026-10-30.md.
 
 # PARCHE DOLBY · Play Dolby + PLI Espacial
 

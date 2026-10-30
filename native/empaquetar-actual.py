@@ -9,7 +9,7 @@ args.add_argument('--origen', required=True)
 opts = args.parse_args()
 repo = Path(__file__).resolve().parent.parent
 source = Path(opts.origen).resolve()
-inventory_path = repo / 'docs/PAQUETE-ACTUAL-2026-10-29.json'
+inventory_path = repo / 'docs/PAQUETE-ACTUAL-2026-10-30.json'
 inventory = json.loads(inventory_path.read_text(encoding='utf-8'))
 version = inventory['version_paquete']
 output = repo / 'publicar'
@@ -48,6 +48,8 @@ def pack(name, entries):
     target.with_suffix(target.suffix+'.sha256').write_text(digest.hexdigest()+'  '+name+'\n', encoding='ascii')
     print(f'LISTO {target.name}: {target.stat().st_size} bytes; SHA-256 {digest.hexdigest()}', flush=True)
 
-# El actualizador reconoce solo PlayDolby-*.zip. El kit USB tiene otro prefijo.
-pack(f'PlayDolby-{version}.zip', [e for e in files if not e['archivo'].startswith('demo/')])
-pack(f'PLI-USB-completo-{version}.zip', files)
+# GitHub receives only the small app/extension package. Never publish audio files.
+software = [e for e in files if not e['archivo'].startswith('demo/') and Path(e['archivo']).suffix.lower() != '.wav']
+if any(Path(e['archivo']).suffix.lower() == '.wav' for e in software):
+    raise RuntimeError('El paquete de GitHub debe contener cero archivos WAV.')
+pack(f'PlayDolby-{version}.zip', software)

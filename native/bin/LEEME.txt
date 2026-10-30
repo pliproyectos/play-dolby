@@ -54,3 +54,12 @@ HERRAMIENTAS (carpeta herramientas)
   diagnostico-audio.ps1, prueba-hardware.cmd. Uso detallado en el proyecto (README.md / CLAUDE.md).
 
 Perfil y bitacora del programa: %LOCALAPPDATA%\PlanetarioBridge
+
+PRUEBAS SIN INTERNET
+  GENERAR-PRUEBAS-7.1.bat crea tonos WAV PCM24 por bocina, vuelta, stereo FL/FR y FC
+  a 48 o 96 kHz. Elige un destino. No requiere instalacion ni WAV de entrada.
+  VOLUMEN BAJO al reproducir. Las canciones y demos originales permanecen en la USB.
+
+ACTUALIZAR LA EXTENSION
+  ACTUALIZAR-EXTENSION.bat copia los archivos a la misma carpeta ya cargada en Chrome.
+  Luego, en chrome://extensions, pulsa Recargar. Esto conserva el identificador del EXE.
