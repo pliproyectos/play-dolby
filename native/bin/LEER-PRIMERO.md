@@ -1,4 +1,4 @@
-# Estado del paquete — 2026.10.30.1
+# Estado del paquete — 2026.10.30.2
 
 La carpeta contiene el EXE PlayDolby.exe recibido de Luis, compilación local del 28 de octubre, sin recompilar. La extensión es PLI Espacial 2026.10.29.3.
 
@@ -9,7 +9,7 @@ Ejecuta `GENERAR-PRUEBAS-7.1.bat`; elige 48 kHz o 96 kHz y la carpeta donde guar
 ## Chrome junto con la Qu-5
 
 1. Abre Play Dolby, elige Qu ASIO Driver y el receptor HDMI e inicia el puente.
-2. Ejecuta `ACTUALIZAR-EXTENSION.bat` y selecciona la carpeta de PLI Espacial que ya está instalada en Chrome.
+2. Ejecuta `ACTUALIZAR-EXTENSION.bat` para detectar automáticamente la carpeta `chrome-extension` situada junto al BAT.
 3. Pulsa Recargar en `chrome://extensions`; activa la captura en la pestaña musical y elige **Con Qu-5 / Play Dolby**. El EXE mezcla ambas fuentes y controla HDMI.
 4. Si se interrumpe la conexión de Chrome, usa **Reconectar Chrome**. El diagnóstico muestra el ID permitido por el EXE.
 5. Para Chrome solo, detén el puente del EXE y selecciona **Solo Chrome**.

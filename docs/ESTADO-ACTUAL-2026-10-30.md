@@ -1,4 +1,4 @@
-# Estado del paquete PLI — 2026.10.30.1
+# Estado del paquete PLI — 2026.10.30.2
 
 El ejecutable PlayDolby.exe de la carpeta se conserva como fue recibido de Luis (versión local 2026.10.28.1); no se recompiló. La extensión PLI Espacial es 2026.10.29.3.
 
@@ -16,7 +16,7 @@ Son tonos técnicos, no música. Los archivos se escriben en una carpeta nueva y
 ## Chrome junto con Qu-5
 
 1. Abre Play Dolby, elige Qu ASIO Driver y el receptor HDMI y pulsa Iniciar puente.
-2. Ejecuta `ACTUALIZAR-EXTENSION.bat` y selecciona la carpeta donde Chrome ya carga PLI. Después pulsa Recargar en `chrome://extensions`.
+2. Ejecuta `ACTUALIZAR-EXTENSION.bat` para detectar automáticamente la carpeta `chrome-extension` que está junto al BAT. Después pulsa Recargar en `chrome://extensions`.
 3. Sobre la pestaña musical activa la captura y elige **Con Qu-5 / Play Dolby**. La app mezcla ambas fuentes y controla el HDMI.
 4. Para Chrome solo, detén primero el puente del EXE y elige **Solo Chrome**. No mantengas simultáneamente la salida directa de la extensión y la salida exclusiva de Play Dolby.
 5. Si se interrumpe el flujo de Chrome, pulsa **Reconectar Chrome**; el diagnóstico muestra el ID que el EXE permite.

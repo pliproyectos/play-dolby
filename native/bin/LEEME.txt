@@ -61,5 +61,5 @@ PRUEBAS SIN INTERNET
   VOLUMEN BAJO al reproducir. Las canciones y demos originales permanecen en la USB.
 
 ACTUALIZAR LA EXTENSION
-  ACTUALIZAR-EXTENSION.bat copia los archivos a la misma carpeta ya cargada en Chrome.
+  ACTUALIZAR-EXTENSION.bat detecta chrome-extension junto al BAT automaticamente.
   Luego, en chrome://extensions, pulsa Recargar. Esto conserva el identificador del EXE.

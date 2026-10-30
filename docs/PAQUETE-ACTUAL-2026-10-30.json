@@ -1,12 +1,12 @@
 {
-  "version_paquete": "2026.10.30.1",
+  "version_paquete": "2026.10.30.2",
   "version_exe_recibido": "2026.10.28.1",
   "fuentes_exe_actual": "Pendientes: permanecen en la otra PC",
   "archivos": [
     {
       "archivo": "VERSION.txt",
       "bytes": 118,
-      "sha256": "c957d859f004dfead14df5567683aa67889f3e1f8da85e6151eca6af459825ed"
+      "sha256": "bc241586e4dec1ee25bc4feae578de3c2b1375f92818775d284f5f1c7f84ea8b"
     },
     {
       "archivo": "actualizacion.json",
@@ -40,8 +40,8 @@
     },
     {
       "archivo": "LEEME.txt",
-      "bytes": 3820,
-      "sha256": "9227b54aae8085dae4d075719dc5b936393d0a7902f9cf9209716d0d13fa7916"
+      "bytes": 3815,
+      "sha256": "9bdc7103eb9420e1ef88ac9fe53898cbdccc4a5e587da46da621ab2de5b43e1d"
     },
     {
       "archivo": "PlayDolby.exe",
@@ -55,13 +55,13 @@
     },
     {
       "archivo": "ACTUALIZAR-EXTENSION.ps1",
-      "bytes": 2943,
-      "sha256": "ac2040a71eb0f9902d22c8e07af99a9083a57c110fa74841d9a35ad0f9bba977"
+      "bytes": 3797,
+      "sha256": "3350657b6948f1bff810f4bd09d90f308bb8e4f3e9e87e3349edc91c2d1d171a"
     },
     {
       "archivo": "ACTUALIZAR-EXTENSION.bat",
-      "bytes": 104,
-      "sha256": "2d247e7aeeb889e519f7be63f867fc49229fde7b7accd3762118b0e9304efd9e"
+      "bytes": 126,
+      "sha256": "ff48e39c4a3e2e1418dd231babed2b852ee9e20f4e0b4828e352b6942e9ba54a"
     },
     {
       "archivo": "ABRIR-PLAY-DOLBY.bat",
@@ -315,8 +315,8 @@
     },
     {
       "archivo": "LEER-PRIMERO.md",
-      "bytes": 1645,
-      "sha256": "75c3a70cea8a8269c9f151ef360a3519b74b690499f627454962e4d31fe80727"
+      "bytes": 1654,
+      "sha256": "19ea3d21cb11e07a91a28e791897dea81c30a95b5cef8383aa6a83083437a747"
     }
   ],
   "archivos_wav_locales_no_publicados": {
