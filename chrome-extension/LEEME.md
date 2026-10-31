@@ -1,6 +1,6 @@
-# PLI Espacial 7.1 — extensión 2026.10.29.3
+# PLI Espacial 7.1 — extensión 2026.10.31.1
 
-Para Chrome y Qu-5 juntos, usa «Con Qu-5 / Play Dolby». El EXE mezcla las fuentes y es el único que abre HDMI. «Solo Chrome» se usa con el puente del EXE detenido.
+Para Chrome y Qu-5 juntos, usa «Con Qu-5 / Play Dolby». El EXE mezcla las fuentes y es el único que abre HDMI. «Solo Chrome» usa la salida de Windows: puede coexistir con el puente al compilar el EXE desde la actualización del 31/10/2026 (WASAPI compartido). Con ejecutables anteriores en exclusiva, detén el puente.
 
 Actualiza en la misma carpeta que Chrome ya tiene cargada, conservando el identificador. El EXE recibido acepta blhfjpfedgoeolfcpejpehpikainihpd. Si se cambia de ruta al reinstalar, el identificador puede cambiar y el EXE rechazar la conexión. Consulta «Ver diagnóstico de conexión».
 
@@ -8,7 +8,7 @@ Después de copiar los archivos, pulsa Recargar en chrome://extensions y activa 
 
 Si el transporte falla, reintenta automáticamente con una espera máxima de cinco segundos. «Reconectar Chrome» reconstruye su procesamiento sin reiniciar el EXE ni volver a capturar la pestaña. El enlace activo confirma la conexión; no confirma que el EXE esté reproduciendo o que las bocinas reciban señal.
 
-El panel incluye el logo PLI. Se conservan Música clásica, Envolvente, Órbita y PLI Espacial con buffer de análisis de 12 segundos. No separa instrumentos individuales; el BPM es aproximado y el ambiente se obtiene de la diferencia estéreo.
+El panel y la barra de Chrome usan el icono pequeño de PLI (16 px y 32 px para pantallas de alta densidad). Se conservan Música clásica, Envolvente, Órbita y PLI Espacial con buffer de análisis de 12 segundos. No separa instrumentos individuales; el BPM es aproximado y el ambiente se obtiene de la diferencia estéreo.
 
 Pruebas:
 - node pruebas/prueba-puente.cjs

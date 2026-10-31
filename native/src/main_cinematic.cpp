@@ -149,18 +149,18 @@ struct Engine {
             auto od = api.Pa_GetDeviceInfo(out);
             if (!od) throw std::runtime_error("Selecciona la salida HDMI.");
             if (api.Pa_GetHostApiInfo(od->hostApi)->type != paWASAPI) throw std::runtime_error("Selecciona una salida WASAPI.");
-            // La frecuencia la fija el reloj USB de la consola (o el archivo); el HDMI exclusivo la toma sin remuestrear.
+            // La consola conserva su reloj; Windows adapta la salida a la frecuencia del mezclador.
             desdeArchivo = in == IdArchivo && !test;
             core.servo = !desdeArchivo;  // archivo: mismo reloj que la salida, copia exacta
             auto id = in >= 0 ? api.Pa_GetDeviceInfo(in) : nullptr;
             rate = in == IdArchivo && archivo.rate ? archivo.rate : id ? id->defaultSampleRate : 48000;
             core.espacio.prepara(core.espacio.disposicion(), rate);  // PLI Espacial: misma ficha, frecuencia de la consola
-            // WASAPI exclusivo: sin mezclador de Windows, periodo mínimo del HDMI (10 ms medido con AMD).
-            // Mientras corre, ningún otro programa puede sonar por el Integra.
-            auto wasapiInfo = wasapi::streamInfo(true, channels);
+            // Compartido: Chrome y el puente pueden usar el mismo receptor simultáneamente.
+            // AutoConvert permite la consola a 96 kHz aunque Windows mezcle a 48 kHz.
+            auto wasapiInfo = wasapi::streamInfo(false, channels, true);
             PaStreamParameters op{ out, int(channels), paFloat32, 0, &wasapiInfo };
             if (api.Pa_IsFormatSupported(nullptr, &op, rate) != paNoError)
-                throw std::runtime_error("El HDMI no acepta " + std::to_string(channels) + " canales a " + std::to_string(int(rate)) + " Hz en modo exclusivo. ¿Otro programa lo está usando?");
+                throw std::runtime_error("El HDMI no acepta " + std::to_string(channels) + " canales a " + std::to_string(int(rate)) + " Hz en modo compartido. Configura la salida de Windows con el mismo número de canales y revisa que ninguna aplicación la use en exclusiva.");
             if (!test) {
                 if (!id && !desdeArchivo) throw std::runtime_error("Selecciona la consola, un archivo WAV o una carpeta de capas en «01 Conecta tu consola».");
                 // Cuántas entradas pide el parche (rutas directas + objetos de PLI Espacial) y de dónde.
@@ -199,7 +199,7 @@ struct Engine {
             if (input) check(api.Pa_StartStream(input));
             check(api.Pa_StartStream(output));
             std::ostringstream s;
-            s << "START " << (test ? "test" : "bridge") << " output=" << od->name << " channels=" << channels << " rate=" << rate << " exclusive latency=" << api.Pa_GetStreamInfo(output)->outputLatency;
+            s << "START " << (test ? "test" : "bridge") << " output=" << od->name << " channels=" << channels << " rate=" << rate << " shared autoconvert latency=" << api.Pa_GetStreamInfo(output)->outputLatency;
             if (input) s << " input=" << api.Pa_GetDeviceInfo(in)->name << " channels=" << inputChannels << " latency=" << api.Pa_GetStreamInfo(input)->inputLatency;
             if (desdeArchivo) s << " input=archivo:" << archivo.nombre << " channels=" << archivo.canales;
             log(s.str());
@@ -301,7 +301,7 @@ void instalaExtension() {
     CloseHandle(pi.hThread); CloseHandle(pi.hProcess);
     log("EXTENSION instalador abierto");
     status(L"Se abrió el instalador de la extensión: en Chrome activa Modo de desarrollador › Cargar descomprimida › Ctrl+V. "
-           L"La extensión y Play Dolby no suenan a la vez: detén el puente para usarla.");
+           L"La extensión y Play Dolby pueden sonar a la vez por la salida compartida de Windows.");
 }
 
 void stop() {

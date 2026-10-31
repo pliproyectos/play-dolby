@@ -72,3 +72,25 @@ Cinematic integra LOGO/miniatura.png convertido a native/assets/pli-app.ico con 
 **Pendiente:** la latencia acústica real (incluye el procesamiento del Integra) no se ha medido; la interfaz gráfica no se probó con estos cambios (solo se compiló); falta una función completa de 60 min.
 
 Prueba física: `Prueba Hardware.bat` en la carpeta principal (cerrar Play Dolby antes).
+
+
+## Actualización 2026-10-31: salida compartida con Chrome
+
+El ejecutable compilado desde este código abre WASAPI en modo compartido con
+conversión de frecuencia de Windows. Así permite que «Solo Chrome» y el puente
+usen la misma salida, incluso si la consola trabaja a 96 kHz y Windows a 48 kHz.
+Configura Windows en 7.1 para conservar ocho canales. Las mediciones anteriores
+en exclusiva son históricas: falta repetir latencia y escucha con Qu-5 e Integra.
+
+Verificado en la laptop: dos flujos silenciosos simultáneos a 96 y 48 kHz en
+Realtek estéreo; pruebas del núcleo, 65 452 comprobaciones espaciales y secuencia
+de canales aprobadas. No se ha verificado todavía la convivencia en HDMI 7.1.
+
+Prueba manual de convivencia (no genera sonido):
+```
+native/tools/zig-x86_64-windows-0.14.1/zig.exe c++ -std=c++17 -O2 native/tests/shared_output_test.cpp -o native/bin/shared_output_test.exe
+native/bin/shared_output_test.exe
+```
+
+Estos cambios requieren recompilar el EXE; subir el código no actualiza los
+binarios ya instalados ni publica automáticamente un Release.

@@ -8,10 +8,9 @@
   * { box-sizing: border-box; }
   body { margin:0; width:330px; background:var(--fondo); color:var(--texto); font:13px "Segoe UI", system-ui, sans-serif; }
   header { padding:14px 16px 10px; border-bottom:1px solid var(--borde); }
-  .logo { width:100%;height:auto;display:block;background:white;border-radius:8px;margin-bottom:12px; }
   button:disabled { opacity:.5;cursor:default; }
   #detalle { white-space:pre-wrap;font-size:11px;color:var(--suave); }
-  h1 { margin:0; font-size:16px; font-weight:600; }
+  h1 { display:flex; align-items:center; gap:6px; margin:0; font-size:16px; font-weight:600; }
   h1 span { color:var(--acento); }
   .estado { margin-top:6px; color:var(--suave); font-size:12px; min-height:16px; }
   .estado.vivo { color:var(--vivo); }
@@ -29,8 +28,7 @@
 </head>
 <body>
 <header>
-  <img class="logo" src="assets/pli-logo.png" alt="PLI Ingeniería Aplicada">
-  <h1>PLI Espacial <span>7.1</span></h1>
+  <h1><img src="iconos/16.png" srcset="iconos/32.png 2x" width="16" height="16" alt=""> PLI Espacial <span>7.1</span></h1>
   <div id="estado" class="estado">Comprobando…</div>
 </header>
 <main>
@@ -38,7 +36,7 @@
   <label>Salida
     <select id="destino">
       <option value="app" selected>Con Qu-5 / Play Dolby · ambas fuentes juntas</option>
-      <option value="directo">Solo Chrome · puente del EXE detenido</option>
+      <option value="directo">Solo Chrome · salida de Windows</option>
     </select>
   </label>
   <label>Modo
@@ -68,7 +66,7 @@
   <button id="diagnostico">Ver diagnóstico de conexión</button>
   <div id="detalle" hidden></div>
   <button id="probar">◎ Probar canales (tono suave en cada bocina)</button>
-  <div class="nota">Para escuchar Chrome y la Qu-5 juntos, inicia el puente en Play Dolby y usa «Con Qu-5 / Play Dolby». La app mezcla las dos fuentes y controla el HDMI. «Solo Chrome» funciona con el puente del EXE detenido y Windows en 7.1.</div>
+  <div class="nota">Para escuchar Chrome y la Qu-5 juntos, inicia el puente en Play Dolby y usa «Con Qu-5 / Play Dolby». La app mezcla las dos fuentes y controla el HDMI. «Solo Chrome» usa la salida de Windows. Con el EXE compilado desde la actualización del 31/10/2026 puede sonar junto al puente; con versiones anteriores, detén el puente. Configura Windows en 7.1.</div>
 </main>
 <script src="popup.js"></script>
 </body>
