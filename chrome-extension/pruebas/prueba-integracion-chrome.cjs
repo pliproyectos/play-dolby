@@ -15,7 +15,7 @@ try{WebSocketServer=require('ws').WebSocketServer;}catch(_){WebSocketServer=requ
  try{
   browser=await chromium.launch({executablePath:'C:/Program Files/Google/Chrome/Application/chrome.exe',headless:true,args:['--allow-file-access-from-files','--autoplay-policy=no-user-gesture-required']});
   const p=await browser.newPage();await p.addInitScript(()=>{
-   window.chrome={runtime:{id:'blhfjpfedgoeolfcpejpehpikainihpd',onMessage:{addListener:f=>window.receptor=f}}};
+   window.chrome={runtime:{id:'ebpjbolnlhmbebbhiooonakajihpknco',onMessage:{addListener:f=>window.receptor=f}}};
    window.mensaje=m=>new Promise(resolve=>receptor({...m,para:'offscreen'},null,resolve));
    navigator.mediaDevices.getUserMedia=async()=>{
     const c=window.fuenteTest=new AudioContext({sampleRate:48000,sinkId:{type:'none'}}),merge=c.createChannelMerger(2),dest=c.createMediaStreamDestination();

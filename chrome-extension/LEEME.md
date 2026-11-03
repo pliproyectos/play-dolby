@@ -1,10 +1,12 @@
-# PLI Espacial 7.1 — extensión 2026.10.31.1
+Play Dolby 2026.11.3.1 — conexión de Chrome en otra PC
 
-Para Chrome y Qu-5 juntos, usa «Con Qu-5 / Play Dolby». El EXE mezcla las fuentes y es el único que abre HDMI. «Solo Chrome» usa la salida de Windows: puede coexistir con el puente al compilar el EXE desde la actualización del 31/10/2026 (WASAPI compartido). Con ejecutables anteriores en exclusiva, detén el puente.
+1. Extrae todo el ZIP en una carpeta fija y abre PlayDolby.exe desde ella. Cierra la versión anterior antes de abrir esta copia.
+2. En chrome://extensions desactiva la extensión PLI anterior. Activa Modo de desarrollador, pulsa Cargar descomprimida y elige chrome-extension dentro de la carpeta extraída.
+3. Comprueba la versión 2026.11.3.1 y el ID ebpjbolnlhmbebbhiooonakajihpknco. Este ID es el mismo en todas las PC.
+4. Inicia el puente del EXE. En la pestaña de música selecciona Con Qu-5 / Play Dolby y pulsa Activar. El panel debe indicar Enlace con Play Dolby activo.
+5. Para revisar una falla abre Ver diagnóstico de conexión.
 
-Actualiza en la misma carpeta que Chrome ya tiene cargada, conservando el identificador. El EXE recibido acepta blhfjpfedgoeolfcpejpehpikainihpd. Si se cambia de ruta al reinstalar, el identificador puede cambiar y el EXE rechazar la conexión. Consulta «Ver diagnóstico de conexión».
-
-Después de copiar los archivos, pulsa Recargar en chrome://extensions y activa otra vez la captura en la pestaña de música. En el paquete USB, ACTUALIZAR-EXTENSION.bat ayuda a copiar a la carpeta existente y guarda un respaldo.
+El paquete conserva el ejecutable de sala con receptor Chrome. Se sustituyó únicamente el identificador de origen permitido en ese binario, cuya fuente exacta no está disponible en el repositorio. En modo conjunto, el EXE mezcla las dos señales. La escucha con la consola y el receptor físico sigue pendiente.
 
 Si el transporte falla, reintenta automáticamente con una espera máxima de cinco segundos. «Reconectar Chrome» reconstruye su procesamiento sin reiniciar el EXE ni volver a capturar la pestaña. El enlace activo confirma la conexión; no confirma que el EXE esté reproduciendo o que las bocinas reciban señal.
 
@@ -16,5 +18,3 @@ Pruebas:
 - node pruebas/prueba-puente-browser.cjs
 - pruebas/prueba-motor.html (37 comprobaciones)
 - pruebas/prueba-espacial.cjs (requiere Playwright disponible)
-
-Ver LEER-PRIMERO-2026-10-29.md junto al EXE para el procedimiento completo y las limitaciones pendientes de verificar en sala.

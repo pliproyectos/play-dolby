@@ -1,7 +1,7 @@
 // Transporte local PLI1: una conexión, sin cola propia de audio.
 (function(global){
 'use strict';
-const URL='ws://127.0.0.1:19771/pli-audio',ID_LEGADO='blhfjpfedgoeolfcpejpehpikainihpd';
+const URL='ws://127.0.0.1:19771/pli-audio',ID_LEGADO='ebpjbolnlhmbebbhiooonakajihpknco';
 function paquete(pcm,rate,secuencia){
  if(!(pcm instanceof Float32Array)||pcm.length%8||pcm.length<128*8||pcm.length>2048*8||!Number.isInteger(rate)||rate<8000||rate>192000)throw Error('Bloque PCM no válido');
  const b=new ArrayBuffer(16+pcm.byteLength),v=new DataView(b);

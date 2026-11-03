@@ -1,17 +1,9 @@
-# Estado del paquete — 2026.10.30.2
+Play Dolby 2026.11.3.1 — conexión de Chrome en otra PC
 
-La carpeta contiene el EXE PlayDolby.exe recibido de Luis, compilación local del 28 de octubre, sin recompilar. La extensión es PLI Espacial 2026.10.29.3.
+1. Extrae todo el ZIP en una carpeta fija y abre PlayDolby.exe desde ella. Cierra la versión anterior antes de abrir esta copia.
+2. En chrome://extensions desactiva la extensión PLI anterior. Activa Modo de desarrollador, pulsa Cargar descomprimida y elige chrome-extension dentro de la carpeta extraída.
+3. Comprueba la versión 2026.11.3.1 y el ID ebpjbolnlhmbebbhiooonakajihpknco. Este ID es el mismo en todas las PC.
+4. Inicia el puente del EXE. En la pestaña de música selecciona Con Qu-5 / Play Dolby y pulsa Activar. El panel debe indicar Enlace con Play Dolby activo.
+5. Para revisar una falla abre Ver diagnóstico de conexión.
 
-## Probar el 7.1 sin internet
-
-Ejecuta `GENERAR-PRUEBAS-7.1.bat`; elige 48 kHz o 96 kHz y la carpeta donde guardar. Windows crea cuatro WAV PCM de 24 bits, ocho canales discretos y nivel máximo −30 dBFS: un tono por bocina, una vuelta por los siete canales principales, estéreo separado por FL/FR y tono solo por FC. Son tonos técnicos, no música. El generador usa PowerShell y .NET que ya incluye Windows; no instala ni descarga nada. Cada sesión crea una carpeta nueva. Mantén el Integra a volumen bajo.
-
-## Chrome junto con la Qu-5
-
-1. Abre Play Dolby, elige Qu ASIO Driver y el receptor HDMI e inicia el puente.
-2. Ejecuta `ACTUALIZAR-EXTENSION.bat` para detectar automáticamente la carpeta `chrome-extension` situada junto al BAT.
-3. Pulsa Recargar en `chrome://extensions`; activa la captura en la pestaña musical y elige **Con Qu-5 / Play Dolby**. El EXE mezcla ambas fuentes y controla HDMI.
-4. Si se interrumpe la conexión de Chrome, usa **Reconectar Chrome**. El diagnóstico muestra el ID permitido por el EXE.
-5. Para Chrome solo, detén el puente del EXE y selecciona **Solo Chrome**.
-
-GitHub contiene el ZIP actualizador del EXE y la extensión, sin WAV de demos ni música. Los audios locales continúan en esta USB. El código fuente del EXE del 28 de octubre está en la otra computadora; el código native de este repositorio es anterior. Falta confirmar la reproducción prolongada con Qu-5 e Integra en sala.
+El paquete conserva el ejecutable de sala con receptor Chrome. Se sustituyó únicamente el identificador de origen permitido en ese binario, cuya fuente exacta no está disponible en el repositorio. En modo conjunto, el EXE mezcla las dos señales. La escucha con la consola y el receptor físico sigue pendiente.

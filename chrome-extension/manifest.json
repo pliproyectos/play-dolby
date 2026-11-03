@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "PLI Espacial 7.1",
-  "version": "2026.10.31.1",
+  "version": "2026.11.3.1",
   "description": "Convierte el audio estéreo de una pestaña (YouTube Music, etc.) en 7.1 para el domo. PLI Ingeniería Aplicada.",
   "permissions": [
     "tabCapture",
@@ -29,5 +29,6 @@
   },
   "background": {
     "service_worker": "service-worker.js"
-  }
+  },
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA3kTVpIFu5XgJMZdTaL3UtDyrCOAW2VRJ2M7bxCIGR6H9WogKwT8F8OtRHCzgSYxhu1rPaTinf4ArxDOKxUogljQBq36HgfkVyo2gQzbk5wGZnzm/yhVFhKhxcD0EpHrr6ZUIf64WW1TN1eFvMGJ16cDdCjloguwECppWIRNYvrzQDs3n5MOExF8Kyt6+8dDh43zCpeaUxlLVbnIgOTrmVhBvTaiUcRAqzGjtmA1QwjxJnN6tGVaZTzlyjaQnetvDoeG/BHWHIEmHlxIX0OrzDn3ASbGzmi7qaOGNQdxlqRNjv+JLbhr+if9aOeEri8yDSMgNEoTd5xz4olREVrtoAwIDAQAB"
 }
