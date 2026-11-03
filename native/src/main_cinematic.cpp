@@ -1,7 +1,8 @@
-﻿#ifndef UNICODE
+#ifndef UNICODE
 #define UNICODE
 #endif
 #define _UNICODE
+#include <winsock2.h>
 #include <windows.h>
 #include <commctrl.h>
 #include <gdiplus.h>
@@ -13,6 +14,9 @@
 #include <cstring>
 #include "../vendor/portaudio.h"
 #include "bridge_core.hpp"
+#include "browser_audio.hpp"
+#include "orientation.hpp"
+browserAudio::Receiver browser;
 #include "fuente_archivo.hpp"
 #include "wasapi_options.hpp"
 #include "window_chrome.hpp"
@@ -70,11 +74,13 @@ void log(const std::string& s) {
 }
 
 // Identificadores de la lista de entradas que no son dispositivos de PortAudio.
+constexpr int IdChrome = -103;
 constexpr int IdArchivo = -100, IdElegirArchivo = -101, IdElegirCapas = -102;
 const char* bridge_names[8] = { "FL", "FR", "C", "LFE", "BL", "BR", "SL", "SR" };
 
 struct Engine {
     bridge::Core core;
+    bridge::Orientation orientation;
     // Fuente archivo: un WAV (o carpeta de capas) en memoria hace de consola. Solo se cambia con el puente detenido.
     fuente::Archivo archivo;
     fuente::Reproductor reproductor;
@@ -103,6 +109,9 @@ struct Engine {
         if (!e.test) {
             if (e.desdeArchivo) e.reproductor.alimenta(e.core, unsigned(n));
             e.core.render(samples, n, e.outputChannels);
+            browser.mix(samples, unsigned(n), e.outputChannels, e.rate);
+            e.orientation.process(samples, unsigned(n), e.outputChannels, e.rate);
+            for(unsigned c=0;c<e.outputChannels;++c){float peak=0;for(unsigned i=0;i<n;++i)peak=std::max(peak,std::abs(samples[i*e.outputChannels+c]));e.core.peak[c]=peak;}
         } else {
             std::fill(samples, samples + n * e.outputChannels, 0.f);
             int channel = e.toneChannel.load();
@@ -141,6 +150,7 @@ struct Engine {
     void start(int in, int out, unsigned channels, bool testing, int tone = -1) {
         stop();
         core.reset();
+        browser.clear();
         test = testing;
         outputChannels = channels;
         inputFlags = 0;
@@ -162,7 +172,7 @@ struct Engine {
             if (api.Pa_IsFormatSupported(nullptr, &op, rate) != paNoError)
                 throw std::runtime_error("El HDMI no acepta " + std::to_string(channels) + " canales a " + std::to_string(int(rate)) + " Hz en modo compartido. Configura la salida de Windows con el mismo número de canales y revisa que ninguna aplicación la use en exclusiva.");
             if (!test) {
-                if (!id && !desdeArchivo) throw std::runtime_error("Selecciona la consola, un archivo WAV o una carpeta de capas en «01 Conecta tu consola».");
+                if (!id && !desdeArchivo && in != IdChrome) throw std::runtime_error("Selecciona la consola, un archivo WAV o una carpeta de capas en «01 Conecta tu consola».");
                 // Cuántas entradas pide el parche (rutas directas + objetos de PLI Espacial) y de dónde.
                 inputChannels = 1; std::string quien;
                 for (unsigned c = 0; c < channels; ++c) {
@@ -174,7 +184,7 @@ struct Engine {
                     unsigned pide = unsigned(std::max(0, o.entrada.load()) + (o.estereo && o.entrada >= 0 ? 2 : 1));
                     if (pide > inputChannels) { inputChannels = pide; quien = "el objeto " + std::to_string(k + 1) + " de PLI Espacial (USB " + std::to_string(pide) + ")"; }
                 }
-                const unsigned tiene = desdeArchivo ? archivo.canales : unsigned(id->maxInputChannels);
+                const unsigned tiene = desdeArchivo ? archivo.canales : id ? unsigned(id->maxInputChannels) : 32u;
                 if (tiene < inputChannels)
                     throw std::runtime_error("La entrada tiene " + std::to_string(tiene) + " canales y " + quien + " pide " + std::to_string(inputChannels) +
                                              ". Elige la consola u otra fuente, o pon en «Silencio» las salidas por encima de USB " + std::to_string(tiene) + ".");
@@ -183,7 +193,7 @@ struct Engine {
                 if (!archivo.cuadros()) throw std::runtime_error("El archivo está vacío.");
                 inputChannels = archivo.canales;
                 reproductor.prepara(&archivo, true);
-            } else if (!test) {
+            } else if (!test && in != IdChrome) {
                 // Bloque ASIO de 64 muestras: con 0 el driver Qu baja a 16 (estable 2 min, pero frágil).
                 // 64 a 96 kHz = 0,67 ms; probado sin faltas ni avisos del driver.
                 PaStreamParameters ip{ in, int(inputChannels), paFloat32, 64. / rate, nullptr };
@@ -226,7 +236,7 @@ std::wstring boxText(HWND c) {
 
 unsigned channelCount() {
     int p = SendMessage(profileBox, CB_GETCURSEL, 0, 0);
-    return p == 0 ? 2 : p == 1 ? 6 : 8;
+    (void)p; return 8;
 }
 
 HWND control(const wchar_t* cls, const wchar_t* text, int x, int y, int w, int h, int id, DWORD extra = 0) {
@@ -290,6 +300,7 @@ void instalaExtension() {
     wchar_t exe[MAX_PATH]; GetModuleFileNameW(nullptr, exe, MAX_PATH);
     auto dir = std::filesystem::path(exe).parent_path();
     std::filesystem::path bat = dir / L"extension-chrome" / L"INSTALAR-EXTENSION.bat";
+    if (!std::filesystem::exists(bat)) bat = dir / L"chrome-extension" / L"INSTALAR-EXTENSION.bat";
     if (!std::filesystem::exists(bat)) bat = (dir / L".." / L".." / L"chrome-extension" / L"INSTALAR-EXTENSION.bat").lexically_normal();
     if (!std::filesystem::exists(bat)) { status(L"No encuentro la extensión de Chrome junto a Play Dolby (carpeta extension-chrome)."); return; }
     wchar_t sys[MAX_PATH]; GetSystemDirectoryW(sys, MAX_PATH);
@@ -338,7 +349,9 @@ void refresh() {
         if (d->maxOutputChannels >= 2 && host->type == paWASAPI) add(outputBox, d->maxOutputChannels);
     }
     fuenteUI::agregaOpciones();  // «▶ Archivo WAV…», «▶ Carpeta de capas…» y el archivo cargado
-    SendMessage(inputBox, CB_SETCURSEL, -1, 0);
+    int chromeIndex = int(SendMessage(inputBox, CB_ADDSTRING, 0, (LPARAM)L"Chrome PLI · sin consola"));
+    SendMessage(inputBox, CB_SETITEMDATA, chromeIndex, IdChrome);
+    SendMessage(inputBox, CB_SETCURSEL, chromeIndex, 0);
     SendMessage(outputBox, CB_SETCURSEL, -1, 0);
     status(asio ? L"Dispositivos detectados. Selecciona la consola ASIO y la salida HDMI WASAPI." : L"No hay controlador ASIO detectado. Puedes probar WASAPI; Para la Qu-5 instala el controlador Qu-5/6/7 y conecta USB-C.");
     tester::sync();
@@ -432,7 +445,7 @@ LRESULT CALLBACK proc(HWND h, UINT m, WPARAM w, LPARAM l) {
         return 0;
     }
     if (m == WM_CTLCOLORSTATIC) {
-        SetTextColor((HDC)w, theme::textLight);
+        SetTextColor((HDC)w, GetDlgCtrlID((HWND)l)==27 && engine.orientation.degrees!=0 ? RGB(255,185,65) : theme::textLight);
         SetBkColor((HDC)w, theme::bgPaper);
         return (LRESULT)theme::background;
     }
@@ -464,6 +477,7 @@ LRESULT CALLBACK proc(HWND h, UINT m, WPARAM w, LPARAM l) {
         bool disabled = d->itemState & ODS_DISABLED, pressed = d->itemState & ODS_SELECTED;
         const bool space = d->CtlID == 19 && engine.core.espacio.activo, hot = d->CtlID == 11 || (d->CtlID == 25 && !actualizacion::lista.empty()) || space;
         COLORREF bg = hot ? theme::blue : d->CtlID == 12 ? RGB(54,39,70) : RGB(35,32,46);
+        if(d->CtlID>=20 && d->CtlID<24 && engine.orientation.degrees!=0)bg=RGB(150,85,10);
         if (disabled) bg = RGB(24, 25, 34);
         else if (pressed) bg = RGB(45, 48, 68);
 
@@ -499,7 +513,16 @@ LRESULT CALLBACK proc(HWND h, UINT m, WPARAM w, LPARAM l) {
         if (id == 19) espacialUI::alterna();
         if (id == 25) actualizacion::instalar();
         if (id == 26) instalaExtension();
-        if (id >= 20 && id < 24) espacialUI::escenaRapida(id - 20);
+        if (id >= 20 && id < 24) {
+            const int angles[]={0,90,-90,180};
+            engine.orientation.degrees=angles[id-20];
+            auto label=angles[id-20] ? L"⚠ GIRO ACTIVO · "+std::to_wstring(angles[id-20])+L"°\nRevisar próxima película" : std::wstring(L"Normal · 0°");
+            SetWindowTextW(GetDlgItem(window,27),label.c_str());
+            for(int button=20;button<24;++button)InvalidateRect(GetDlgItem(window,button),nullptr,TRUE);
+            InvalidateRect(GetDlgItem(window,27),nullptr,TRUE);
+            log("ORIENTACION "+std::to_string(angles[id-20]));
+        }
+        if(id==28 && code==CBN_SELCHANGE){const float levels[]={1.f,.501187f,.251189f,0.f};browser.gain=levels[std::clamp(int(SendMessage((HWND)l,CB_GETCURSEL,0,0)),0,3)];}
         if (id == 24 && code == CBN_SELCHANGE) {
             const float speeds[] = { 0.f, .25f, .5f, .75f, 1.f, 1.25f, 1.5f };
             int s = std::clamp(int(SendMessage((HWND)l, CB_GETCURSEL, 0, 0)), 0, 6);
@@ -557,6 +580,7 @@ LRESULT CALLBACK proc(HWND h, UINT m, WPARAM w, LPARAM l) {
         return 0;
     }
     if (m == WM_DESTROY) {
+        browser.stop();
         PostQuitMessage(0);
         return 0;
     }
@@ -570,6 +594,7 @@ int WINAPI wWinMain(HINSTANCE inst, HINSTANCE, PWSTR, int) {
     if (Gdiplus::GdiplusStartup(&graphicsToken, &graphicsInput, nullptr) != Gdiplus::Ok) return 1;
     try {
         api.load();
+        browser.start();
     } catch (const std::exception& e) {
         MessageBoxW(nullptr, wide(e.what()).c_str(), L"Play Dolby", MB_ICONERROR);
         Gdiplus::GdiplusShutdown(graphicsToken);
@@ -609,25 +634,23 @@ int WINAPI wWinMain(HINSTANCE inst, HINSTANCE, PWSTR, int) {
     chrome::setIcons(window);
 
     // Actualizaciones con aviso: «Buscar actualizaciones», o resaltado «Actualización X · Instalar» si hay una lista.
-    HWND botonActualizar = control(L"BUTTON", L"⟳  Buscar actualizaciones", 690, 18, 318, 35, 25, WS_TABSTOP);
+    HWND botonActualizar = control(L"BUTTON", L"⟳  Buscar actualizaciones", 690, 18, 274, 35, 25, WS_TABSTOP);
     control(L"BUTTON", L"◆  Extensión Chrome 7.1", 440, 18, 236, 35, 26, WS_TABSTOP);
 
-    // Dynamic Space (PLI Espacial fase 3b), en la columna junto al domo: encendido, escenas rápidas y velocidad maestra.
-    control(L"BUTTON", L"○  DYNAMIC SPACE", 974, 80, 216, 30, 19, WS_TABSTOP);
-    {
-        const wchar_t* escenas[] = { L"◌  Quieto", L"↻  Órbita", L"∿  Respira", L"★  La de 1:45" };
-        for (int i = 0; i < 4; ++i) control(L"BUTTON", escenas[i], 974, 116 + i * 31, 216, 27, 20 + i, WS_TABSTOP);
-        HWND speed = control(L"COMBOBOX", L"", 974, 241, 216, 260, 24, CBS_DROPDOWNLIST | WS_TABSTOP);
-        for (auto s : { L"Velocidad 0× · congelar", L"Velocidad 0,25×", L"Velocidad 0,5×", L"Velocidad 0,75×", L"Velocidad 1×", L"Velocidad 1,25×", L"Velocidad 1,5×" }) SendMessage(speed, CB_ADDSTRING, 0, (LPARAM)s);
-        SendMessage(speed, CB_SETCURSEL, 4, 0);
-    }
+    control(L"STATIC", L"ORIENTACIÓN DE SALIDA", 974, 80, 216, 30, 0);
+    const wchar_t* orientations[] = {L"0° · Normal / Restablecer", L"+90° · Derecha", L"−90° · Izquierda", L"180° · Invertir frente"};
+    for(int i=0;i<4;++i)control(L"BUTTON",orientations[i],974,116+i*31,216,27,20+i,WS_TABSTOP);
+    control(L"STATIC",L"Normal · 0°",974,245,216,50,27);
+    HWND chromeLevel=control(L"COMBOBOX",L"",974,18,216,150,28,CBS_DROPDOWNLIST|WS_TABSTOP);
+    for(auto value:{L"Chrome 0 dB",L"Chrome −6 dB",L"Chrome −12 dB",L"Chrome Silencio"})SendMessage(chromeLevel,CB_ADDSTRING,0,(LPARAM)value);
+    SendMessage(chromeLevel,CB_SETCURSEL,0,0);
 
     inputBox = control(L"COMBOBOX", L"", 48, 320, 534, 350, 1, CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP);
     outputBox = control(L"COMBOBOX", L"", 636, 320, 536, 350, 2, CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP);
 
     profileBox = control(L"COMBOBOX", L"", 30, 384, 214, 180, 3, CBS_DROPDOWNLIST | WS_TABSTOP);
     for (auto s : { L"Estéreo · 2 canales", L"5.1 · 6 canales", L"7.1 · 8 canales" }) SendMessage(profileBox, CB_ADDSTRING, 0, (LPARAM)s);
-    SendMessage(profileBox, CB_SETCURSEL, 0, 0);
+    SendMessage(profileBox, CB_SETCURSEL, 2, 0);
 
     gainBox = control(L"COMBOBOX", L"", 258, 384, 196, 180, 4, CBS_DROPDOWNLIST | WS_TABSTOP);
     for (auto s : { L"Ganancia −18 dB", L"Ganancia −12 dB", L"Ganancia −6 dB", L"Ganancia 0 dB" }) SendMessage(gainBox, CB_ADDSTRING, 0, (LPARAM)s);

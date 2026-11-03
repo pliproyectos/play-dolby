@@ -1,4 +1,4 @@
-param([string]$OutputName='PlayDolby-Desarrollo.exe')
+﻿param([string]$OutputName='PlayDolby-Desarrollo.exe')
 $ErrorActionPreference='Stop'
 $env:ZIG_GLOBAL_CACHE_DIR=Join-Path $PSScriptRoot '.zig-cache-global'
 $env:ZIG_LOCAL_CACHE_DIR=Join-Path $PSScriptRoot '.zig-cache-local'
@@ -25,8 +25,12 @@ try {
     if($LASTEXITCODE){throw 'Error al compilar las pruebas del probador.'}
     & .\bin\channel_sequence_tests.exe
     if($LASTEXITCODE){throw 'Fallaron las pruebas del probador.'}
+    & $compiler c++ -std=c++17 -O2 -Wall -Wextra tests/browser_orientation_tests.cpp -o bin/browser_orientation_tests.exe -lws2_32 -lcrypt32 -ladvapi32
+    if($LASTEXITCODE){throw 'Error al compilar las pruebas de orientación y Chrome.'}
+    & .\bin\browser_orientation_tests.exe
+    if($LASTEXITCODE){throw 'Fallaron las pruebas de orientación.'}
     & $compiler c++ -std=c++17 -O2 -Wall -Wextra tests/hw_bridge_test.cpp -o bin/hw_bridge_test.exe
     if($LASTEXITCODE){throw 'Error al compilar la prueba de hardware.'}
-    & $compiler c++ -std=c++17 -O2 -Wall -Wextra -municode '-Wl,--subsystem,windows' src/main_cinematic.cpp bin/pli-app.res -o (Join-Path 'bin' $OutputName) -lgdiplus -lcomctl32 -lgdi32 -lole32 -luuid
+    & $compiler c++ -std=c++17 -O2 -Wall -Wextra -municode '-Wl,--subsystem,windows' src/main_cinematic.cpp bin/pli-app.res -o (Join-Path 'bin' $OutputName) -lgdiplus -lcomctl32 -lgdi32 -lole32 -luuid -lws2_32 -lcrypt32 -ladvapi32
     if($LASTEXITCODE){throw 'Error al compilar Play Dolby.'}
 } finally {Pop-Location}
