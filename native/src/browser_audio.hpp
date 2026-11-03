@@ -3,7 +3,7 @@
 #include <ws2tcpip.h>
 #include <wincrypt.h>
 #include <thread>
-#include <mutex>
+#include <memory>
 #include <vector>
 #include <array>
 #include <atomic>
@@ -21,12 +21,16 @@ class Receiver {
     std::thread worker;
     std::atomic<bool> stopping{false};
     SOCKET listener=INVALID_SOCKET;
-    std::mutex mutex;
-    std::vector<Frame> queue{32768};
-    uint64_t read=0,write=0;
-    double phase=0;
-    unsigned sampleRate=48000;
-    bool primed=false;
+    // Each generation has one producer (network) and one consumer (HDMI).
+    struct Buffer {
+        std::vector<Frame> queue{32768};
+        std::atomic<uint64_t> read{0},write{0};
+        const unsigned sampleRate;
+        double phase=0;
+        bool primed=false;
+        explicit Buffer(unsigned rate):sampleRate(rate){}
+    };
+    std::shared_ptr<Buffer> buffer=std::make_shared<Buffer>(48000);
     bool receive(SOCKET socket,void* data,size_t bytes) {
         auto p=static_cast<char*>(data);
         while(bytes && !stopping) {
@@ -118,15 +122,20 @@ class Receiver {
             if(rate<8000 || rate>192000 || frames<128 || frames>2048 || data.size()!=16+size_t(frames)*32)break;
             if(haveSequence && (uint32_t(sequence-previous)==0 || uint32_t(sequence-previous)>0x7fffffff))break;
             previous=sequence;haveSequence=true;
-            std::lock_guard<std::mutex> lock(mutex);
-            if(sampleRate!=rate || write-read+frames>queue.size()){read=write=0;phase=0;primed=false;}
-            sampleRate=rate;
+            auto block=std::atomic_load(&buffer);
+            auto write=block->write.load();
+            if(block->sampleRate!=rate || write-block->read.load()+frames>block->queue.size()){
+                block=std::make_shared<Buffer>(rate);
+                std::atomic_store(&buffer,block);
+                write=0;
+            }
             for(unsigned i=0;i<frames;++i) {
                 Frame frame;
                 std::memcpy(frame.data(),data.data()+16+i*32,32);
                 for(auto& sample:frame)if(!std::isfinite(sample))sample=0;
-                queue[write++%queue.size()]=frame;
+                block->queue[write++%block->queue.size()]=frame;
             }
+            block->write.store(write);
             packets++;
         }
         connected=false;clear();
@@ -146,7 +155,7 @@ public:
     std::atomic<bool> connected{false};
     std::atomic<uint64_t> packets{0};
     std::atomic<float> gain{1.f};
-    void clear(){std::lock_guard<std::mutex> lock(mutex);read=write=0;phase=0;primed=false;}
+    void clear(){std::atomic_store(&buffer,std::make_shared<Buffer>(48000));}
     void start() {
         WSADATA data;if(WSAStartup(MAKEWORD(2,2),&data))throw std::runtime_error("No se pudo iniciar la conexión Chrome.");
         listener=socket(AF_INET,SOCK_STREAM,IPPROTO_TCP);
@@ -161,8 +170,14 @@ public:
     void stop(){stopping=true;if(worker.joinable())worker.join();if(listener!=INVALID_SOCKET){closesocket(listener);listener=INVALID_SOCKET;WSACleanup();}}
     ~Receiver(){stop();}
     void mix(float* output,unsigned frames,unsigned channels,double rate) {
-        std::unique_lock<std::mutex> lock(mutex,std::try_to_lock);if(!lock.owns_lock())return;
-        const double target=sampleRate*.064;
+        auto block=std::atomic_load(&buffer);
+        const auto write=block->write.load();
+        auto read=block->read.load();
+        auto& queue=block->queue;
+        auto& phase=block->phase;
+        auto& primed=block->primed;
+        const unsigned sampleRate=block->sampleRate;
+        const double target=sampleRate*.096;
         if(!primed){if(write-read<unsigned(target))return;primed=true;}
         const double ratio=sampleRate/rate*(1.+std::clamp((double(write-read)-target)/target*.002,-.003,.003));
         const float level=gain.load();
@@ -172,6 +187,7 @@ public:
             for(unsigned c=0;c<channels;++c)output[i*channels+c]+=float(a[c]+phase*(b[c]-a[c]))*level;
             phase+=ratio;auto consumed=uint64_t(phase);phase-=consumed;read+=std::min(consumed,write-read);
         }
+        block->read.store(read);
     }
 };
 }
