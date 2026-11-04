@@ -1,3 +1,7 @@
+Play Dolby 2026.11.3.5
+
+Pulsa Centro ↔ Frontal derecho cuando esos canales estén cruzados en una película. El botón queda ámbar y dice ACTIVO. Vuelve a pulsarlo para desactivar solo el intercambio. Restablecer a 0° quita también el giro. Incluye las mejoras de estabilidad de captura de consola y HDMI.
+
 Play Dolby 2026.11.3.2 — orientación de salida y Chrome reconstruido
 
 Se reemplazaron Quieto, Órbita, Respira y La de 1:45 por 0°, +90° (derecha), −90° (izquierda) y 180°. Se gira la mezcla de consola/archivo y Chrome. El subwoofer conserva su canal. Entre las bocinas físicas se distribuye el sonido según el ángulo. El probador sigue identificando las bocinas físicas, sin giro.

@@ -479,6 +479,7 @@ LRESULT CALLBACK proc(HWND h, UINT m, WPARAM w, LPARAM l) {
         bool disabled = d->itemState & ODS_DISABLED, pressed = d->itemState & ODS_SELECTED;
         const bool space = d->CtlID == 19 && engine.core.espacio.activo, hot = d->CtlID == 11 || (d->CtlID == 25 && !actualizacion::lista.empty()) || space;
         COLORREF bg = hot ? theme::blue : d->CtlID == 12 ? RGB(54,39,70) : RGB(35,32,46);
+        if(d->CtlID==29 && engine.orientation.swapCenterRight.load())bg=RGB(150,85,10);
         if(d->CtlID>=20 && d->CtlID<24 && engine.orientation.degrees!=0)bg=RGB(150,85,10);
         if (disabled) bg = RGB(24, 25, 34);
         else if (pressed) bg = RGB(45, 48, 68);
@@ -515,6 +516,13 @@ LRESULT CALLBACK proc(HWND h, UINT m, WPARAM w, LPARAM l) {
         if (id == 19) espacialUI::alterna();
         if (id == 25) actualizacion::instalar();
         if (id == 26) instalaExtension();
+        if (id == 29 || id == 20) {
+            const bool active = id == 29 && !engine.orientation.swapCenterRight.load();
+            engine.orientation.swapCenterRight = active;
+            HWND button = GetDlgItem(window,29);
+            SetWindowTextW(button,active ? L"⚠ Centro ↔ Derecho ACTIVO" : L"Centro ↔ Frontal derecho");
+            InvalidateRect(button,nullptr,TRUE);
+        }
         if (id >= 20 && id < 24) {
             const int angles[]={0,90,-90,180};
             engine.orientation.degrees=angles[id-20];
@@ -639,7 +647,7 @@ int WINAPI wWinMain(HINSTANCE inst, HINSTANCE, PWSTR, int) {
     HWND botonActualizar = control(L"BUTTON", L"⟳  Buscar actualizaciones", 690, 18, 274, 35, 25, WS_TABSTOP);
     control(L"BUTTON", L"◆  Extensión Chrome 7.1", 440, 18, 236, 35, 26, WS_TABSTOP);
 
-    control(L"STATIC", L"ORIENTACIÓN DE SALIDA", 974, 80, 216, 30, 0);
+    control(L"BUTTON", L"Centro ↔ Frontal derecho", 974, 80, 216, 30, 29, WS_TABSTOP);
     const wchar_t* orientations[] = {L"0° · Normal / Restablecer", L"+90° · Derecha", L"−90° · Izquierda", L"180° · Invertir frente"};
     for(int i=0;i<4;++i)control(L"BUTTON",orientations[i],974,116+i*31,216,27,20+i,WS_TABSTOP);
     control(L"STATIC",L"Normal · 0°",974,245,216,50,27);

@@ -8,6 +8,7 @@ class Orientation {
     using Matrix=std::array<std::array<float,8>,8>;
     Matrix current{};
     int applied=0;
+    bool appliedSwap=false;
     unsigned remaining=0;
     static Matrix matrix(int degrees) {
         Matrix result{};
@@ -26,10 +27,14 @@ class Orientation {
     }
 public:
     std::atomic<int> degrees{0};
+    std::atomic<bool> swapCenterRight{false};
     Orientation():current(matrix(0)){}
     void process(float* output,unsigned frames,unsigned channels,double rate) {
         int selected=degrees.load();auto target=matrix(selected);
-        if(selected!=applied){applied=selected;remaining=std::max(1u,unsigned(rate*.02));}
+        const bool swap=swapCenterRight.load();
+        // Correct the film's input channels before applying the room rotation.
+        if(swap) for(auto& row:target) std::swap(row[1],row[2]);
+        if(selected!=applied || swap!=appliedSwap){applied=selected;appliedSwap=swap;remaining=std::max(1u,unsigned(rate*.02));}
         for(unsigned i=0;i<frames;++i){
             if(remaining){for(unsigned d=0;d<8;++d)for(unsigned s=0;s<8;++s)current[d][s]+=(target[d][s]-current[d][s])/remaining;--remaining;}
             std::array<float,8> input{},result{};
