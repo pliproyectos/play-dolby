@@ -1,3 +1,5 @@
+Versión 2026.11.3.6. Ganancia inicial 0 dB en cada apertura. Cargar un perfil restaura la ganancia guardada.
+
 Play Dolby 2026.11.3.5
 
 Pulsa Centro ↔ Frontal derecho cuando esos canales estén cruzados en una película. El botón queda ámbar y dice ACTIVO. Vuelve a pulsarlo para desactivar solo el intercambio. Restablecer a 0° quita también el giro. Incluye las mejoras de estabilidad de captura de consola y HDMI.

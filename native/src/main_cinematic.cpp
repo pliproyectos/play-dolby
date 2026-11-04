@@ -664,7 +664,8 @@ int WINAPI wWinMain(HINSTANCE inst, HINSTANCE, PWSTR, int) {
 
     gainBox = control(L"COMBOBOX", L"", 258, 384, 196, 180, 4, CBS_DROPDOWNLIST | WS_TABSTOP);
     for (auto s : { L"Ganancia −18 dB", L"Ganancia −12 dB", L"Ganancia −6 dB", L"Ganancia 0 dB" }) SendMessage(gainBox, CB_ADDSTRING, 0, (LPARAM)s);
-    SendMessage(gainBox, CB_SETCURSEL, 0, 0);
+    SendMessage(gainBox, CB_SETCURSEL, 3, 0);
+    engine.core.gain = 1.f;
 
     control(L"BUTTON", L"↻  Dispositivos", 474, 384, 220, 36, 10, WS_TABSTOP);
     control(L"BUTTON", L"Guardar", 710, 384, 120, 36, 14, WS_TABSTOP);
