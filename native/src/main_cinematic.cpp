@@ -161,6 +161,7 @@ struct Engine {
             if (api.Pa_GetHostApiInfo(od->hostApi)->type != paWASAPI) throw std::runtime_error("Selecciona una salida WASAPI.");
             // La consola conserva su reloj; Windows adapta la salida a la frecuencia del mezclador.
             desdeArchivo = in == IdArchivo && !test;
+            core.margin = 192;
             core.servo = !desdeArchivo;  // archivo: mismo reloj que la salida, copia exacta
             auto id = in >= 0 ? api.Pa_GetDeviceInfo(in) : nullptr;
             rate = in == IdArchivo && archivo.rate ? archivo.rate : id ? id->defaultSampleRate : 48000;
@@ -168,7 +169,7 @@ struct Engine {
             // Compartido: Chrome y el puente pueden usar el mismo receptor simultáneamente.
             // AutoConvert permite la consola a 96 kHz aunque Windows mezcle a 48 kHz.
             auto wasapiInfo = wasapi::streamInfo(false, channels, true);
-            PaStreamParameters op{ out, int(channels), paFloat32, 0, &wasapiInfo };
+            PaStreamParameters op{ out, int(channels), paFloat32, od->defaultLowOutputLatency, &wasapiInfo };
             if (api.Pa_IsFormatSupported(nullptr, &op, rate) != paNoError)
                 throw std::runtime_error("El HDMI no acepta " + std::to_string(channels) + " canales a " + std::to_string(int(rate)) + " Hz en modo compartido. Configura la salida de Windows con el mismo número de canales y revisa que ninguna aplicación la use en exclusiva.");
             if (!test) {
@@ -194,9 +195,10 @@ struct Engine {
                 inputChannels = archivo.canales;
                 reproductor.prepara(&archivo, true);
             } else if (!test && in != IdChrome) {
-                // Bloque ASIO de 64 muestras: con 0 el driver Qu baja a 16 (estable 2 min, pero frágil).
-                // 64 a 96 kHz = 0,67 ms; probado sin faltas ni avisos del driver.
-                PaStreamParameters ip{ in, int(inputChannels), paFloat32, 64. / rate, nullptr };
+                // Allow capture callbacks and the independent HDMI clock room for scheduler jitter.
+                core.margin = unsigned(std::ceil(rate * .012));
+                PaStreamParameters ip{ in, int(inputChannels), paFloat32,
+                    std::max(id->defaultLowInputLatency, 256. / rate), nullptr };
                 check(api.Pa_IsFormatSupported(&ip, nullptr, rate));
                 check(api.Pa_OpenStream(&input, &ip, nullptr, rate, paFramesPerBufferUnspecified, paNoFlag, capture, this));
             }
