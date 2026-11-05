@@ -51,6 +51,6 @@ FICHA DEL DOMO
 
 HERRAMIENTAS (carpeta herramientas)
   escena71 (escena JSON -> WAV 7.1), adm71 (ADM), capas71 (cancion -> capas), iamf71 (IAMF),
-  diagnostico-audio.ps1, prueba-hardware.cmd. Uso detallado en el proyecto (README.md / CLAUDE.md).
+  diagnostico-audio.ps1, prueba-hardware.cmd. Uso detallado en el proyecto (README.md / CONTEXTO-PROYECTO.md).
 
 Perfil y bitacora del programa: %LOCALAPPDATA%\PlanetarioBridge

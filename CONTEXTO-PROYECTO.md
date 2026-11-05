@@ -1,18 +1,28 @@
+# Play Dolby · versión 2026.11.5.1
+
+PLI Espacial se selecciona en la ventana principal, sin abrir otro panel. Para la Qu-5 incluye Música clásica, Audio por ritmo y Envolvente con base continua, con el aviso «Solo música y películas». Voz en vivo envía la consola al frente con menor margen de búfer; se selecciona con el puente detenido. Chrome mantiene sus propios efectos.
+
+Se retiraron del EXE las entradas WAV, capas 7.1 y Chrome sin consola. Se mantienen ganancia inicial en 0 dB, corrección de giro e intercambio centro/frontal derecho. La latencia acústica y la estabilidad prolongada requieren prueba en sala con Qu-5 e Integra.
+
+---
+
+## Registro histórico (no describe la interfaz vigente)
+
 # Estado vigente — 2026-10-29
 
 La versión operativa es native/bin/PlayDolby.exe, copiada de la USB de Luis (EXE 2026.10.28.1). Su fuente actualizada está pendiente de traer desde la otra computadora. NO reemplazar ese binario con una compilación de native/src anterior. La extensión está en chrome-extension/, versión 2026.10.29.3. Leer README.md y docs/ESTADO-ACTUAL-2026-10-30.md antes de trabajar. Las propuestas históricas y respaldos duplicados se retiraron por petición de Luis; Git conserva su historial.
 
 ---
 
-# PARCHE DOLBY — contexto para Claude
+# PARCHE DOLBY — contexto del proyecto
 
 Planetario con domo 7.1. Cadena: consola **Allen & Heath Qu-5** → USB/ASIO → PC Windows con
 **Play Dolby** (C++, PortAudio, `native/`) → HDMI de GPU AMD (WASAPI) → receptor **Integra DRX-8.4**
 → amplificadores **NEXO NXAMP4x1 Mk2** → bocinas NEXO ePS10/ePS8-EN54 y subwoofer eLS18.
 Especificación y etapas: `SPEC.md`. Ficha de equipos y preguntas abiertas de sala:
-`EQUIPOS-SALA.md`. Kit de señales de prueba: `pruebas-domo/` (tiene su propio `CLAUDE.md`).
+`EQUIPOS-SALA.md`. Kit de señales de prueba: `pruebas-domo/` (tiene su propio `CONTEXTO-PROYECTO.md`).
 
-La memoria de Claude **no viaja** entre PCs: este archivo es la memoria del proyecto. Estado, no
+Este archivo conserva el contexto del proyecto entre PCs. Estado, no
 bitácora: actualízalo en sitio cuando algo cambie de «no verificado» a «verificado».
 
 ## Verificado en el domo — 2026-10-19 (PC de Luis, sesión con el sistema conectado)

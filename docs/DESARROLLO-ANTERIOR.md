@@ -10,14 +10,14 @@ el motor espacial propio de PLI, y los entrega por HDMI al receptor **Integra DR
 a los amplificadores NEXO y a las bocinas.
 
 > Cierre temporal de sesión: **2026-10-21**. El estado completo, qué está verificado y qué falta, está
-> en **[CLAUDE.md](CLAUDE.md)**. Empieza por ahí.
+> en **[CONTEXTO-PROYECTO.md](CONTEXTO-PROYECTO.md)**. Empieza por ahí.
 
 ## Leer primero
 
 | Archivo | Qué tiene |
 |---|---|
 | [docs/GUIA-DE-USUARIO.md](docs/GUIA-DE-USUARIO.md) | **Guía de usuario** de Play Dolby, con capturas: instalar, cada parte de la pantalla, recetas paso a paso y errores frecuentes |
-| [CLAUDE.md](CLAUDE.md) | Estado del proyecto, lo verificado en sala, lo pendiente y todas las herramientas con su comando. Claude Code lo lee solo al abrir la carpeta |
+| [CONTEXTO-PROYECTO.md](CONTEXTO-PROYECTO.md) | Estado del proyecto, lo verificado en sala, lo pendiente y todas las herramientas con su comando. |
 | [PLAN-MOTOR-ESPACIAL-PLI.md](PLAN-MOTOR-ESPACIAL-PLI.md) | PLI Espacial: por qué existe, sus fases (1 a 4 hechas) y la verificación de cada una |
 | [native/espacial/ESCENAS.md](native/espacial/ESCENAS.md) | Formato de escenas (JSON) y uso de ADM |
 | [EQUIPOS-SALA.md](EQUIPOS-SALA.md) | Ficha técnica de los equipos de la sala y respuestas del ingeniero |
@@ -60,7 +60,7 @@ Opcional:
 | `instalador/` · `docs/` | Fuentes del instalador o USB portable, y la guía de usuario con sus capturas |
 | `pruebas-domo/` | Kit de señales de prueba del domo y **`domo.json`**, la ficha con el ángulo de cada bocina. Toda la espacialización sale de ahí |
 | `musica-7.1/` | Canciones de ejemplo (`origen/`) y sus versiones 7.1, escenas y ADM |
-| `memoria-claude/` | Memoria de Claude Code de este proyecto, para llevarla a otra PC (ver `LEEME.txt`) |
+| `memoria-proyecto/` | Contexto de este proyecto, para llevarla a otra PC (ver `LEEME.txt`) |
 
 ## Qué subir si el espacio importa
 
@@ -71,7 +71,7 @@ Todo lo que sigue es **regenerable**; el resto es fuente y documentación.
 | `native/.zig-cache-global`, `native/.zig-cache-local` | 250 MB | Se rehacen solos al compilar (la primera vez tarda unos minutos) |
 | `native/tools/ear-venv` | 208 MB | `native\tools\crear-ear-venv.ps1` (no sirve copiarlo) |
 | `pruebas-domo/salida` | 1,5 GB | `pruebas-domo\generar-todo.bat` |
-| Todo lo de `musica-7.1/` **excepto `origen/`** | 3,5 GB | `capas71`, `escena71` y `adm71` desde `origen/` y las escenas (ver CLAUDE.md) |
+| Todo lo de `musica-7.1/` **excepto `origen/`** | 3,5 GB | `capas71`, `escena71` y `adm71` desde `origen/` y las escenas (ver CONTEXTO-PROYECTO.md) |
 | `native/bin` | 115 MB | Los tres `build-*.ps1` |
 
 Si se omite todo eso, el proyecto baja de ≈ 6 GB a ≈ 0,6 GB. **No omitir** `native/tools/zig-*`,

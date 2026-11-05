@@ -16,8 +16,8 @@
 #include "bridge_core.hpp"
 #include "browser_audio.hpp"
 #include "orientation.hpp"
+#include "console_spatial.hpp"
 browserAudio::Receiver browser;
-#include "fuente_archivo.hpp"
 #include "wasapi_options.hpp"
 #include "window_chrome.hpp"
 
@@ -74,21 +74,17 @@ void log(const std::string& s) {
 }
 
 // Identificadores de la lista de entradas que no son dispositivos de PortAudio.
-constexpr int IdChrome = -103;
-constexpr int IdArchivo = -100, IdElegirArchivo = -101, IdElegirCapas = -102;
 const char* bridge_names[8] = { "FL", "FR", "C", "LFE", "BL", "BR", "SL", "SR" };
 
 struct Engine {
     bridge::Core core;
     bridge::Orientation orientation;
-    // Fuente archivo: un WAV (o carpeta de capas) en memoria hace de consola. Solo se cambia con el puente detenido.
-    fuente::Archivo archivo;
-    fuente::Reproductor reproductor;
-    bool desdeArchivo = false;
+    bridge::ConsoleSpatial consoleSpatial;
     PaStream *input = nullptr, *output = nullptr;
     unsigned inputChannels = 0, outputChannels = 2;
     std::atomic<uint64_t> inputFlags{0}, outputFlags{0};
     bool test = false;
+    bool liveVoice = false;
     double rate = 48000;  // Sigue al reloj de la consola (Qu-5 USB: 96 kHz).
     std::atomic<int> toneChannel{-1};
     std::atomic<unsigned> toneRemaining{0};
@@ -107,10 +103,29 @@ struct Engine {
         if (flags) ++e.outputFlags;
         auto samples = static_cast<float*>(out);
         if (!e.test) {
-            if (e.desdeArchivo) e.reproductor.alimenta(e.core, unsigned(n));
             e.core.render(samples, n, e.outputChannels);
-            browser.mix(samples, unsigned(n), e.outputChannels, e.rate);
-            e.orientation.process(samples, unsigned(n), e.outputChannels, e.rate);
+            if (e.liveVoice) {
+                // Keep the console voice at the front. Chrome retains its own output correction.
+                constexpr unsigned chunkSize = 128;
+                std::array<float, chunkSize * bridge::Channels> chromeAudio;
+                for (unsigned base = 0; base < n; base += chunkSize) {
+                    const unsigned frames = std::min(chunkSize, unsigned(n) - base);
+                    std::fill_n(chromeAudio.data(), frames * e.outputChannels, 0.f);
+                    browser.mix(chromeAudio.data(), frames, e.outputChannels, e.rate);
+                    e.orientation.process(chromeAudio.data(), frames, e.outputChannels, e.rate);
+                    for (unsigned i = 0; i < frames; ++i) {
+                        for (unsigned c = 0; c < e.outputChannels; ++c) {
+                            auto& sample = samples[(base + i) * e.outputChannels + c];
+                            const float voice = c < 3 ? sample : 0.f;
+                            sample = std::clamp(voice + chromeAudio[i * e.outputChannels + c], -1.f, 1.f);
+                        }
+                    }
+                }
+            } else {
+                e.consoleSpatial.process(samples, unsigned(n), e.outputChannels);
+                browser.mix(samples, unsigned(n), e.outputChannels, e.rate);
+                e.orientation.process(samples, unsigned(n), e.outputChannels, e.rate);
+            }
             for(unsigned c=0;c<e.outputChannels;++c){float peak=0;for(unsigned i=0;i<n;++i)peak=std::max(peak,std::abs(samples[i*e.outputChannels+c]));e.core.peak[c]=peak;}
         } else {
             std::fill(samples, samples + n * e.outputChannels, 0.f);
@@ -137,7 +152,6 @@ struct Engine {
     void stop() {
         if (input) { api.Pa_AbortStream(input); api.Pa_CloseStream(input); input = nullptr; }
         if (output) { api.Pa_AbortStream(output); api.Pa_CloseStream(output); output = nullptr; }
-        desdeArchivo = false;
         toneRemaining = 0;
         toneChannel = -1;
         for (auto& p : core.peak) p = 0;
@@ -160,12 +174,18 @@ struct Engine {
             if (!od) throw std::runtime_error("Selecciona la salida HDMI.");
             if (api.Pa_GetHostApiInfo(od->hostApi)->type != paWASAPI) throw std::runtime_error("Selecciona una salida WASAPI.");
             // La consola conserva su reloj; Windows adapta la salida a la frecuencia del mezclador.
-            desdeArchivo = in == IdArchivo && !test;
             core.margin = 192;
-            core.servo = !desdeArchivo;  // archivo: mismo reloj que la salida, copia exacta
             auto id = in >= 0 ? api.Pa_GetDeviceInfo(in) : nullptr;
-            rate = in == IdArchivo && archivo.rate ? archivo.rate : id ? id->defaultSampleRate : 48000;
-            core.espacio.prepara(core.espacio.disposicion(), rate);  // PLI Espacial: misma ficha, frecuencia de la consola
+            rate = id ? id->defaultSampleRate : 48000;
+            std::string inputName = id && id->name ? id->name : "";
+            for (auto& c : inputName) c = char(std::tolower(static_cast<unsigned char>(c)));
+            const bool qu = inputName.find("qu asio") != std::string::npos ||
+                            inputName.find("qu-5") != std::string::npos ||
+                            inputName.find("qu 5") != std::string::npos;
+            liveVoice = !test && consoleSpatial.mode.load() == bridge::ConsoleSpatial::LiveVoice;
+            if (liveVoice && !qu)
+                throw std::runtime_error("Voz en vivo requiere seleccionar la entrada USB de la Qu-5.");
+            consoleSpatial.prepare(rate, !test && qu && !liveVoice);
             // Compartido: Chrome y el puente pueden usar el mismo receptor simultáneamente.
             // AutoConvert permite la consola a 96 kHz aunque Windows mezcle a 48 kHz.
             auto wasapiInfo = wasapi::streamInfo(false, channels, true);
@@ -173,32 +193,23 @@ struct Engine {
             if (api.Pa_IsFormatSupported(nullptr, &op, rate) != paNoError)
                 throw std::runtime_error("El HDMI no acepta " + std::to_string(channels) + " canales a " + std::to_string(int(rate)) + " Hz en modo compartido. Configura la salida de Windows con el mismo número de canales y revisa que ninguna aplicación la use en exclusiva.");
             if (!test) {
-                if (!id && !desdeArchivo && in != IdChrome) throw std::runtime_error("Selecciona la consola, un archivo WAV o una carpeta de capas en «01 Conecta tu consola».");
+                if (!id) throw std::runtime_error("Selecciona la entrada de la consola en «01 Conecta tu consola».");
                 // Cuántas entradas pide el parche (rutas directas + objetos de PLI Espacial) y de dónde.
                 inputChannels = 1; std::string quien;
-                for (unsigned c = 0; c < channels; ++c) {
+                for (unsigned c = 0; c < (liveVoice ? 3u : channels); ++c) {
                     unsigned pide = unsigned(std::max(0, core.route[c].load()) + 1);
                     if (pide > inputChannels) { inputChannels = pide; quien = "la salida " + std::string(bridge_names[c]) + " (USB " + std::to_string(pide) + ")"; }
                 }
-                if (core.espacio.activo) for (int k = 0; k < pli::MaxObjetos; ++k) {
-                    auto& o = core.espacio.obj[k];
-                    unsigned pide = unsigned(std::max(0, o.entrada.load()) + (o.estereo && o.entrada >= 0 ? 2 : 1));
-                    if (pide > inputChannels) { inputChannels = pide; quien = "el objeto " + std::to_string(k + 1) + " de PLI Espacial (USB " + std::to_string(pide) + ")"; }
-                }
-                const unsigned tiene = desdeArchivo ? archivo.canales : id ? unsigned(id->maxInputChannels) : 32u;
+                const unsigned tiene = unsigned(id->maxInputChannels);
                 if (tiene < inputChannels)
                     throw std::runtime_error("La entrada tiene " + std::to_string(tiene) + " canales y " + quien + " pide " + std::to_string(inputChannels) +
                                              ". Elige la consola u otra fuente, o pon en «Silencio» las salidas por encima de USB " + std::to_string(tiene) + ".");
             }
-            if (!test && desdeArchivo) {
-                if (!archivo.cuadros()) throw std::runtime_error("El archivo está vacío.");
-                inputChannels = archivo.canales;
-                reproductor.prepara(&archivo, true);
-            } else if (!test && in != IdChrome) {
+            if (!test) {
                 // Allow capture callbacks and the independent HDMI clock room for scheduler jitter.
-                core.margin = unsigned(std::ceil(rate * .012));
+                core.margin = unsigned(std::ceil(rate * (liveVoice ? .003 : .012)));
                 PaStreamParameters ip{ in, int(inputChannels), paFloat32,
-                    std::max(id->defaultLowInputLatency, 256. / rate), nullptr };
+                    liveVoice ? 64. / rate : std::max(id->defaultLowInputLatency, 256. / rate), nullptr };
                 check(api.Pa_IsFormatSupported(&ip, nullptr, rate));
                 check(api.Pa_OpenStream(&input, &ip, nullptr, rate, paFramesPerBufferUnspecified, paNoFlag, capture, this));
             }
@@ -212,8 +223,8 @@ struct Engine {
             check(api.Pa_StartStream(output));
             std::ostringstream s;
             s << "START " << (test ? "test" : "bridge") << " output=" << od->name << " channels=" << channels << " rate=" << rate << " shared autoconvert latency=" << api.Pa_GetStreamInfo(output)->outputLatency;
+            if (liveVoice) s << " voz_en_vivo";
             if (input) s << " input=" << api.Pa_GetDeviceInfo(in)->name << " channels=" << inputChannels << " latency=" << api.Pa_GetStreamInfo(input)->inputLatency;
-            if (desdeArchivo) s << " input=archivo:" << archivo.nombre << " channels=" << archivo.canales;
             log(s.str());
         } catch (...) {
             stop();
@@ -292,8 +303,6 @@ void stop();
 bool start(bool test, int channel = -1);
 
 #include "channel_tester.hpp"
-#include "espacial_panel.hpp"
-#include "fuente_ui.hpp"
 #include "actualizacion_ui.hpp"
 
 // Botón «Extensión Chrome 7.1»: abre INSTALAR-EXTENSION.bat (copia la extensión a la PC, pone la ruta en el
@@ -350,10 +359,7 @@ void refresh() {
         if (d->maxInputChannels > 0 && (host->type == paASIO || host->type == paWASAPI)) add(inputBox, d->maxInputChannels);
         if (d->maxOutputChannels >= 2 && host->type == paWASAPI) add(outputBox, d->maxOutputChannels);
     }
-    fuenteUI::agregaOpciones();  // «▶ Archivo WAV…», «▶ Carpeta de capas…» y el archivo cargado
-    int chromeIndex = int(SendMessage(inputBox, CB_ADDSTRING, 0, (LPARAM)L"Chrome PLI · sin consola"));
-    SendMessage(inputBox, CB_SETITEMDATA, chromeIndex, IdChrome);
-    SendMessage(inputBox, CB_SETCURSEL, chromeIndex, 0);
+    SendMessage(inputBox, CB_SETCURSEL, -1, 0);
     SendMessage(outputBox, CB_SETCURSEL, -1, 0);
     status(asio ? L"Dispositivos detectados. Selecciona la consola ASIO y la salida HDMI WASAPI." : L"No hay controlador ASIO detectado. Puedes probar WASAPI; Para la Qu-5 instala el controlador Qu-5/6/7 y conecta USB-C.");
     tester::sync();
@@ -447,7 +453,9 @@ LRESULT CALLBACK proc(HWND h, UINT m, WPARAM w, LPARAM l) {
         return 0;
     }
     if (m == WM_CTLCOLORSTATIC) {
-        SetTextColor((HDC)w, GetDlgCtrlID((HWND)l)==27 && engine.orientation.degrees!=0 ? RGB(255,185,65) : theme::textLight);
+        const int id = GetDlgCtrlID((HWND)l);
+        const bool warning = id == 47 || (id == 27 && engine.orientation.degrees != 0);
+        SetTextColor((HDC)w, warning ? RGB(255,185,65) : theme::textLight);
         SetBkColor((HDC)w, theme::bgPaper);
         return (LRESULT)theme::background;
     }
@@ -477,7 +485,7 @@ LRESULT CALLBACK proc(HWND h, UINT m, WPARAM w, LPARAM l) {
         }
         if (d->CtlType != ODT_BUTTON) return FALSE;
         bool disabled = d->itemState & ODS_DISABLED, pressed = d->itemState & ODS_SELECTED;
-        const bool space = d->CtlID == 19 && engine.core.espacio.activo, hot = d->CtlID == 11 || (d->CtlID == 25 && !actualizacion::lista.empty()) || space;
+        const bool hot = d->CtlID == 11 || (d->CtlID == 25 && !actualizacion::lista.empty());
         COLORREF bg = hot ? theme::blue : d->CtlID == 12 ? RGB(54,39,70) : RGB(35,32,46);
         if(d->CtlID==29 && engine.orientation.swapCenterRight.load())bg=RGB(150,85,10);
         if(d->CtlID>=20 && d->CtlID<24 && engine.orientation.degrees!=0)bg=RGB(150,85,10);
@@ -502,7 +510,6 @@ LRESULT CALLBACK proc(HWND h, UINT m, WPARAM w, LPARAM l) {
     if (m == WM_COMMAND) {
         int id = LOWORD(w), code = HIWORD(w);
         if (code == CBN_SELCHANGE) {
-            if (id == 1) fuenteUI::seleccion();
             InvalidateRect((HWND)l, nullptr, FALSE);
             tester::sync();
         }
@@ -512,8 +519,21 @@ LRESULT CALLBACK proc(HWND h, UINT m, WPARAM w, LPARAM l) {
         if (id == 14) save();
         if (id == 15) load();
         if (id == 16) tester::open();
-        if (id == 18) espacialUI::open();
-        if (id == 19) espacialUI::alterna();
+        if (id == 18 && code == CBN_SELCHANGE) {
+            using Spatial = bridge::ConsoleSpatial;
+            const int selection = int(SendMessage((HWND)l, CB_GETCURSEL, 0, 0));
+            const auto current = engine.consoleSpatial.mode.load();
+            const auto selected = static_cast<Spatial::Mode>(std::clamp(selection, 0, int(Spatial::LiveVoice)));
+            HWND notice = GetDlgItem(window, 47);
+            if (engine.running() && (selected == Spatial::LiveVoice || current == Spatial::LiveVoice)) {
+                SendMessage((HWND)l, CB_SETCURSEL, current, 0);
+                status(L"Detén el puente antes de cambiar el modo Voz en vivo.");
+                return 0;
+            }
+            engine.consoleSpatial.mode = selected;
+            SetWindowTextW(notice, selected == Spatial::LiveVoice ? L"Qu-5 · Frontal · Baja latencia" :
+                selected != Spatial::Off ? L"Solo música y películas" : L"");
+        }
         if (id == 25) actualizacion::instalar();
         if (id == 26) instalaExtension();
         if (id == 29 || id == 20) {
@@ -533,12 +553,6 @@ LRESULT CALLBACK proc(HWND h, UINT m, WPARAM w, LPARAM l) {
             log("ORIENTACION "+std::to_string(angles[id-20]));
         }
         if(id==28 && code==CBN_SELCHANGE){const float levels[]={1.f,.501187f,.251189f,0.f};browser.gain=levels[std::clamp(int(SendMessage((HWND)l,CB_GETCURSEL,0,0)),0,3)];}
-        if (id == 24 && code == CBN_SELCHANGE) {
-            const float speeds[] = { 0.f, .25f, .5f, .75f, 1.f, 1.25f, 1.5f };
-            int s = std::clamp(int(SendMessage((HWND)l, CB_GETCURSEL, 0, 0)), 0, 6);
-            engine.core.espacio.velocidad = speeds[s];
-            status(L"Dynamic Space: velocidad maestra " + boxText((HWND)l).substr(10) + L".");
-        }
         if (id >= 100 && id < 108) start(true, id - 100);
         if (id == 3 && code == CBN_SELCHANGE) {
             enableControls(true);
@@ -551,12 +565,9 @@ LRESULT CALLBACK proc(HWND h, UINT m, WPARAM w, LPARAM l) {
             static const auto began=std::chrono::steady_clock::now();
             theme::animationSeconds=std::chrono::duration<double>(std::chrono::steady_clock::now()-began).count();
             BOOL effects=TRUE;SystemParametersInfoW(SPI_GETCLIENTAREAANIMATION,0,&effects,0);
-            // Dynamic Space encendido: domo y barras se animan siempre; apagado, solo si Windows tiene animaciones.
-            const bool space=engine.core.espacio.activo;
-            if(!IsIconic(h)&&(space||effects))cinematicView::invalidate(h,space?theme::dynamicBounds:theme::orbitBounds);
+            if(!IsIconic(h) && effects) cinematicView::invalidate(h,theme::orbitBounds);
             return 0;
         }
-        espacialUI::syncPrincipal();
         actualizacion::tick();
         tester::tick();
 
@@ -571,8 +582,6 @@ LRESULT CALLBACK proc(HWND h, UINT m, WPARAM w, LPARAM l) {
                 return 0;
             }
             std::wostringstream s;
-            if (engine.desdeArchivo)
-                s << L"Archivo " << fuenteUI::tiempo(engine.reproductor.segundos()) << L" / " << fuenteUI::tiempo(double(engine.archivo.cuadros()) / engine.archivo.rate) << L" (se repite) | ";
             s << (engine.test ? L"Tono de prueba −36 dBFS" : L"Puente en vivo") << L" | buffer " << engine.core.ring.available() * 1000 / unsigned(engine.rate) << L" ms · " << int(engine.rate / 1000) << L" kHz | corrección " << int(engine.core.ppm.load()) << L" ppm\n"
               << L"Faltas: " << engine.core.underflows << L" | desbordes: " << engine.core.overflows << L" | clipping: " << engine.core.clipped << L" | avisos driver E/S: " << engine.inputFlags << L" / " << engine.outputFlags;
             status(s.str());
@@ -585,7 +594,6 @@ LRESULT CALLBACK proc(HWND h, UINT m, WPARAM w, LPARAM l) {
     if (m == WM_CLOSE) {
         stop();
         if(tester::panel)DestroyWindow(tester::panel);
-        if(espacialUI::panel)DestroyWindow(espacialUI::panel);
         DestroyWindow(h);
         return 0;
     }
@@ -598,7 +606,7 @@ LRESULT CALLBACK proc(HWND h, UINT m, WPARAM w, LPARAM l) {
 }
 
 int WINAPI wWinMain(HINSTANCE inst, HINSTANCE, PWSTR, int) {
-    CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);  // diálogos de archivo/carpeta de Windows
+    CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
     Gdiplus::GdiplusStartupInput graphicsInput;
     ULONG_PTR graphicsToken;
     if (Gdiplus::GdiplusStartup(&graphicsToken, &graphicsInput, nullptr) != Gdiplus::Ok) return 1;
@@ -685,7 +693,14 @@ int WINAPI wWinMain(HINSTANCE inst, HINSTANCE, PWSTR, int) {
         testButtons[c] = control(L"BUTTON", L"▷  Probar", x + 12, 684, 114, 28, 100 + c, WS_TABSTOP);
     }
 
-    control(L"BUTTON", L"✦  PLI Espacial", 514, 745, 228, 36, 18, WS_TABSTOP);
+    HWND spatialMode = control(L"COMBOBOX", L"", 514, 745, 228, 215, 18, CBS_DROPDOWNLIST | WS_TABSTOP);
+    for (auto label : { L"PLI Espacial · Apagado", L"Qu-5 · Música clásica",
+                        L"Qu-5 · Audio por ritmo", L"Qu-5 · Base continua", L"Qu-5 · Voz en vivo" }) {
+        SendMessage(spatialMode, CB_ADDSTRING, 0, (LPARAM)label);
+    }
+    SendMessage(spatialMode, CB_SETCURSEL, 0, 0);
+    HWND spatialNotice = control(L"STATIC", L"", 514, 783, 228, 20, 47, SS_CENTER | SS_NOPREFIX);
+    SendMessage(spatialNotice, WM_SETFONT, (WPARAM)smallFont, TRUE);
     control(L"BUTTON", L"▶  Iniciar puente", 758, 745, 228, 36, 11, WS_TABSTOP);
     control(L"BUTTON", L"■  Detener · Esc", 1002, 745, 174, 36, 12, WS_TABSTOP);
 
@@ -702,9 +717,6 @@ int WINAPI wWinMain(HINSTANCE inst, HINSTANCE, PWSTR, int) {
     SetWindowPos(window,nullptr,work.left+(work.right-work.left-initialWidth)/2,work.top+(work.bottom-work.top-initialHeight)/2,initialWidth,initialHeight,SWP_NOZORDER|SWP_NOACTIVATE);
     cinematicView::fit(window);
     refresh();
-    espacialUI::cargaFicha();  // puente detenido: lee pruebas-domo\domo.json para PLI Espacial
-    theme::dynamicPainter = espacialUI::pintaPrincipal;
-    espacialUI::syncPrincipal();
     actualizacion::inicia(botonActualizar);
     SetTimer(window, 1, 100, nullptr);
     SetTimer(window, 2, 33, nullptr);
@@ -718,7 +730,6 @@ int WINAPI wWinMain(HINSTANCE inst, HINSTANCE, PWSTR, int) {
             continue;
         }
         if(tester::panel&&IsDialogMessage(tester::panel,&msg))continue;
-        if(espacialUI::panel&&IsDialogMessage(espacialUI::panel,&msg))continue;
         if (!IsDialogMessage(window, &msg)) {
             TranslateMessage(&msg);
             DispatchMessage(&msg);

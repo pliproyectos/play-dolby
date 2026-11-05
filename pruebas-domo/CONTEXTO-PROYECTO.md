@@ -1,4 +1,4 @@
-# Kit de pruebas del domo — contexto para Claude
+# Kit de pruebas del domo — contexto del proyecto
 
 Lo lees porque Luis abrió una sesión en esta carpeta, probablemente desde la USB (`D:\PARCHE DOLBY\pruebas-domo\`) y en otra PC con Windows 11. La memoria de la sesión anterior **no viaja**: lo que necesitas está aquí. Para el detalle humano, lee `LEEME.md`; para el proyecto completo, `..\SPEC.md`.
 
