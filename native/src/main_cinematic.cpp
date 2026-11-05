@@ -238,6 +238,7 @@ HWND routes[8] = {}, meters[8] = {}, testButtons[8] = {};
 
 #include "ui_theme_cinematic.hpp"
 #include "cinematic_viewport.hpp"
+#include "spatial_visual.hpp"
 
 std::wstring boxText(HWND c) {
     int n = GetWindowTextLengthW(c);
@@ -565,7 +566,7 @@ LRESULT CALLBACK proc(HWND h, UINT m, WPARAM w, LPARAM l) {
             static const auto began=std::chrono::steady_clock::now();
             theme::animationSeconds=std::chrono::duration<double>(std::chrono::steady_clock::now()-began).count();
             BOOL effects=TRUE;SystemParametersInfoW(SPI_GETCLIENTAREAANIMATION,0,&effects,0);
-            if(!IsIconic(h) && effects) cinematicView::invalidate(h,theme::orbitBounds);
+            if(!IsIconic(h) && (effects || engine.running())) cinematicView::invalidate(h,theme::dynamicBounds);
             return 0;
         }
         actualizacion::tick();
@@ -715,6 +716,8 @@ int WINAPI wWinMain(HINSTANCE inst, HINSTANCE, PWSTR, int) {
     int initialWidth=std::min(int(bounds.right-bounds.left),int(work.right-work.left));
     int initialHeight=std::min(int(bounds.bottom-bounds.top),int(work.bottom-work.top));
     SetWindowPos(window,nullptr,work.left+(work.right-work.left-initialWidth)/2,work.top+(work.bottom-work.top-initialHeight)/2,initialWidth,initialHeight,SWP_NOZORDER|SWP_NOACTIVATE);
+    spatialVisual::initialize();
+    theme::dynamicPainter = spatialVisual::pintaPrincipal;
     cinematicView::fit(window);
     refresh();
     actualizacion::inicia(botonActualizar);
