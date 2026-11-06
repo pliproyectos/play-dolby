@@ -33,7 +33,12 @@ public:
         int selected=degrees.load();auto target=matrix(selected);
         const bool swap=swapCenterRight.load();
         // Correct the film's input channels before applying the room rotation.
-        if(swap) for(auto& row:target) std::swap(row[1],row[2]);
+        if(swap) for(auto& row:target) {
+            std::swap(row[1],row[2]);
+            // Replace SR with SL before room rotation; retain SL in its own output.
+            row[6] += row[7];
+            row[7] = 0;
+        }
         if(selected!=applied || swap!=appliedSwap){applied=selected;appliedSwap=swap;remaining=std::max(1u,unsigned(rate*.02));}
         for(unsigned i=0;i<frames;++i){
             if(remaining){for(unsigned d=0;d<8;++d)for(unsigned s=0;s<8;++s)current[d][s]+=(target[d][s]-current[d][s])/remaining;--remaining;}

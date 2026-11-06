@@ -540,6 +540,7 @@ LRESULT CALLBACK proc(HWND h, UINT m, WPARAM w, LPARAM l) {
         if (id == 29 || id == 20) {
             const bool active = id == 29 && !engine.orientation.swapCenterRight.load();
             engine.orientation.swapCenterRight = active;
+            status(active ? L"Corrección de película ACTIVA: centro ↔ frontal derecho y surround izquierdo → surround derecho. Desactívala para la siguiente película." : L"Corrección de película desactivada. Canales originales.");
             HWND button = GetDlgItem(window,29);
             SetWindowTextW(button,active ? L"⚠ Centro ↔ Derecho ACTIVO" : L"Centro ↔ Frontal derecho");
             InvalidateRect(button,nullptr,TRUE);
